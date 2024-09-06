@@ -67,6 +67,6 @@ spec:
   authenticationEnabled: false
   authorizationEnabled: false
   brokerRef: broker
-  port: 1883
+  port: 8883
   serviceName: aio-mq-dmqtt-frontend
   serviceType: clusterIp
