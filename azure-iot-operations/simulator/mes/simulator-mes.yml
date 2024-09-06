@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: azure-iot-operations
+  name: iiot-simulator-erp-mes
+  labels:
+    app: iiot-simulator-erp-mes
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: iiot-simulator-erp-mes
+  template:
+    metadata:
+      labels:
+        app: iiot-simulator-erp-mes
+    spec:
+      containers:
+        - name: iiot-simulator-erp-mes
+          image: ghcr.io/azure-samples/explore-iot-operations/http-grpc-callout:latest
+          imagePullPolicy: Always
+          ports:
+          - name: http
+            containerPort: 3333
+          - name: grpc
+            containerPort: 3334
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          command:
+            - "./bin/http-grpc-callout"
+            - "--stdin=false"
+            - "--config=/etc/http-grpc-callout/config.yml"
+          volumeMounts:
+            - mountPath: /etc/http-grpc-callout/config.yml
+              subPath: config.yml
+              name: config
+              readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: iiot-simulator-erp-mes-conf
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: azure-iot-operations
+  name: callout-svc-http
+  labels:
+    app: iiot-simulator-erp-mes
+spec:
+  ports:
+  - port: 3333
+    name: http
+  type: ClusterIP
+  selector:
+    app: iiot-simulator-erp-mes
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: azure-iot-operations
+  name: callout-svc-grpc
+  labels:
+    app: iiot-simulator-erp-mes
+spec:
+  ports:
+  - port: 3334
+    name: grpc
+  type: ClusterIP
+  selector:
+    app: iiot-simulator-erp-mes
