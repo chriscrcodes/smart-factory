@@ -67,6 +67,13 @@ spec:
   authenticationEnabled: false
   authorizationEnabled: false
   brokerRef: broker
-  port: 1883
+  port: 8883
+  protocol: mqtt
   serviceName: aio-mq-dmqtt-frontend
-  serviceType: clusterIp
+  serviceType: loadBalancer
+  tls:
+    automatic:
+      issuerRef:
+        group: cert-manager.io
+        kind: Issuer
+        name: mq-dmqtt-frontend

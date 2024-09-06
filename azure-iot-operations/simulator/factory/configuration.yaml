@@ -12,7 +12,7 @@ data:
     simulation:
       target:
         host: aio-mq-dmqtt-frontend
-        port: 1883
+        port: 8883
       sites:
         - name: 7H27L4
           assetCount: 1
