@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   namespace: azure-iot-operations
-  name: iiot-simulator-conf
+  name: iiot-simulator-factory-conf
 data:
   config.yml: |-
     metrics:

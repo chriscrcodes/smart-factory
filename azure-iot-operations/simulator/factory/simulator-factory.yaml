@@ -2,21 +2,21 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   namespace: azure-iot-operations
-  name: iiot-simulator
+  name: iiot-simulator-factory
   labels:
-    app: iiot-simulator
+    app: iiot-simulator-factory
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: iiot-simulator
+      app: iiot-simulator-factory
   template:
     metadata:
       labels:
-        app: iiot-simulator
+        app: iiot-simulator-factory
     spec:
       containers:
-        - name: iiot-simulator
+        - name: iiot-simulator-factory
           image: ghcr.io/azure-samples/explore-iot-operations/industrial-data-simulator:latest
           imagePullPolicy: Always
           ports:
@@ -41,7 +41,7 @@ spec:
       volumes:
         - name: config
           configMap:
-            name: iiot-simulator-conf
+            name: iiot-simulator-factory-conf
 ---
 apiVersion: v1
 kind: Service
@@ -49,19 +49,19 @@ metadata:
   namespace: azure-iot-operations
   name: simulator-svc-prom
   labels:
-    app: iiot-simulator
+    app: iiot-simulator-factory
 spec:
   ports:
   - port: 2114
     name: prometheus
   type: ClusterIP
   selector:
-    app: iiot-simulator
+    app: iiot-simulator-factory
 ---
 apiVersion: mq.iotoperations.azure.com/v1beta1
 kind: BrokerListener
 metadata:
-  name: iiot-simulator-listener
+  name: iiot-simulator-factory-listener
   namespace: azure-iot-operations
 spec:
   authenticationEnabled: false

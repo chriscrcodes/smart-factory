@@ -2,21 +2,21 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   namespace: azure-iot-operations
-  name: iiot-simulator-erp-mes
+  name: iiot-simulator-mes
   labels:
-    app: iiot-simulator-erp-mes
+    app: iiot-simulator-mes
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: iiot-simulator-erp-mes
+      app: iiot-simulator-mes
   template:
     metadata:
       labels:
-        app: iiot-simulator-erp-mes
+        app: iiot-simulator-mes
     spec:
       containers:
-        - name: iiot-simulator-erp-mes
+        - name: iiot-simulator-mes
           image: ghcr.io/azure-samples/explore-iot-operations/http-grpc-callout:latest
           imagePullPolicy: Always
           ports:
@@ -43,7 +43,7 @@ spec:
       volumes:
         - name: config
           configMap:
-            name: iiot-simulator-erp-mes-conf
+            name: iiot-simulator-mes-conf
 ---
 apiVersion: v1
 kind: Service
@@ -51,14 +51,14 @@ metadata:
   namespace: azure-iot-operations
   name: callout-svc-http
   labels:
-    app: iiot-simulator-erp-mes
+    app: iiot-simulator-mes
 spec:
   ports:
   - port: 3333
     name: http
   type: ClusterIP
   selector:
-    app: iiot-simulator-erp-mes
+    app: iiot-simulator-mes
 ---
 apiVersion: v1
 kind: Service
@@ -66,11 +66,11 @@ metadata:
   namespace: azure-iot-operations
   name: callout-svc-grpc
   labels:
-    app: iiot-simulator-erp-mes
+    app: iiot-simulator-mes
 spec:
   ports:
   - port: 3334
     name: grpc
   type: ClusterIP
   selector:
-    app: iiot-simulator-erp-mes
+    app: iiot-simulator-mes
