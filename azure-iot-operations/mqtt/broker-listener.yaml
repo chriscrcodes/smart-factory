@@ -1,0 +1,12 @@
+apiVersion: mq.iotoperations.azure.com/v1beta1
+kind: BrokerListener
+metadata:
+  name: mqtt-non-tls-listener
+  namespace: azure-iot-operations
+spec:
+  brokerRef: broker
+  serviceType: loadBalancer
+  serviceName: mqtt-non-tls-listener
+  authenticationEnabled: false
+  authorizationEnabled: false
+  port: 8884
