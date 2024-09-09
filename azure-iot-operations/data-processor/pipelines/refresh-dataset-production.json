@@ -1,0 +1,54 @@
+{
+  "properties": {
+    "description": "Refresh Dataset - production",
+    "enabled": true,
+    "input": {
+      "displayName": "HTTP endpoint - productionData",
+      "type": "input/http@v1",
+      "next": [
+        "output"
+      ],
+      "viewOptions": {
+        "position": {
+          "x": 0,
+          "y": 80
+        }
+      },
+      "url": "http://callout-svc-http:3333/productionData",
+      "method": "GET",
+      "format": {
+        "type": "json"
+      },
+      "request": {
+        "body": "{}",
+        "headers": []
+      },
+      "interval": "15m",
+      "authentication": {
+        "type": "none"
+      },
+      "partitionCount": 1,
+      "partitionStrategy": {
+        "type": "id",
+        "expression": "0"
+      }
+    },
+    "stages": {
+      "output": {
+        "displayName": "Reference dataset - production-data",
+        "type": "output/refdata@v1",
+        "viewOptions": {
+          "position": {
+            "x": 0,
+            "y": 352
+          }
+        },
+        "dataset": "production-data"
+      }
+    },
+    "provisioningState": "Succeeded"
+  },
+  "name": "refresh-dataset-production",
+  "type": "microsoft.iotoperationsdataprocessor/instances/pipelines",
+  "location": "westeurope"
+}

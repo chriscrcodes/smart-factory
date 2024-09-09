@@ -1,0 +1,14 @@
+apiVersion: mq.iotoperations.azure.com/v1beta1
+kind: KafkaConnectorTopicMap
+metadata:
+  name: eventhub-topic-map
+  namespace: azure-iot-operations
+spec:
+  kafkaConnectorRef: bridge-eventhub
+  routes:
+    - mqttToKafka:
+        name: "AIO Silver Aggregated to Event Hub"
+        mqttTopic: Processed-Data/Silver/Aggregated
+        kafkaTopic: aio-silver-aggregated
+        kafkaAcks: one
+        qos: 1

@@ -1,0 +1,193 @@
+{
+  "properties": {
+    "description": "Aggregate Data",
+    "enabled": true,
+    "input": {
+      "displayName": "MQ - 'Processed-Data/Silver/RealTime' topic",
+      "type": "input/mqtt@v1",
+      "next": [
+        "node-26f7d8"
+      ],
+      "viewOptions": {
+        "position": {
+          "x": 0,
+          "y": 80
+        }
+      },
+      "broker": "tls://aio-mq-dmqtt-frontend:8883",
+      "qos": 1,
+      "cleanSession": false,
+      "topics": [
+        "Processed-Data/Silver/RealTime"
+      ],
+      "authentication": {
+        "type": "serviceAccountToken"
+      },
+      "format": {
+        "type": "json"
+      },
+      "partitionCount": 1,
+      "partitionStrategy": {
+        "type": "key",
+        "expression": ".payload.Cell"
+      }
+    },
+    "stages": {
+      "node-26f7d8": {
+        "displayName": "Aggregate - 1min",
+        "type": "processor/aggregate@v1",
+        "next": [
+          "output"
+        ],
+        "viewOptions": {
+          "position": {
+            "x": 0,
+            "y": 256
+          }
+        },
+        "window": {
+          "type": "tumbling",
+          "size": "1m"
+        },
+        "properties": [
+          {
+            "function": "last",
+            "inputPath": ".topic",
+            "outputPath": ".topic"
+          },
+          {
+            "function": "last",
+            "inputPath": ".payload.Enterprise",
+            "outputPath": ".payload.Enterprise"
+          },
+          {
+            "function": "last",
+            "inputPath": ".payload.Site",
+            "outputPath": ".payload.Site"
+          },
+          {
+            "function": "last",
+            "inputPath": ".payload.Area",
+            "outputPath": ".payload.Area"
+          },
+          {
+            "function": "last",
+            "inputPath": ".payload.Line",
+            "outputPath": ".payload.Line"
+          },
+          {
+            "function": "last",
+            "inputPath": ".payload.Cell",
+            "outputPath": ".payload.Cell"
+          },
+          {
+            "function": "last",
+            "inputPath": ".payload.Operator",
+            "outputPath": ".payload.Operator"
+          },
+          {
+            "function": "last",
+            "inputPath": ".payload.Shift",
+            "outputPath": ".payload.Shift"
+          },
+          {
+            "function": "last",
+            "inputPath": ".payload.Product",
+            "outputPath": ".payload.Product"
+          },
+          {
+            "function": "last",
+            "inputPath": ".payload.Timestamp",
+            "outputPath": ".payload.Timestamp"
+          },
+          {
+            "function": "last",
+            "inputPath": ".payload.LastCycleTime",
+            "outputPath": ".payload.LastCycleTime"
+          },
+          {
+            "function": "last",
+            "inputPath": ".payload.TotalOperatingTime",
+            "outputPath": ".payload.TotalOperatingTime"
+          },
+          {
+            "function": "last",
+            "inputPath": ".payload.PlannedProductionTime",
+            "outputPath": ".payload.PlannedProductionTime"
+          },
+          {
+            "function": "count",
+            "inputPath": ".",
+            "outputPath": ".payload.UnitsProduced"
+          },
+          {
+            "function": "sum",
+            "inputPath": ".payload.QualityStatus",
+            "outputPath": ".payload.GoodUnitsProduced"
+          },
+          {
+            "function": "average",
+            "inputPath": ".payload.Energy",
+            "outputPath": ".payload.Energy"
+          },
+          {
+            "function": "average",
+            "inputPath": ".payload.Temperature",
+            "outputPath": ".payload.Temperature"
+          },
+          {
+            "function": "average",
+            "inputPath": ".payload.Humidity",
+            "outputPath": ".payload.Humidity"
+          },
+          {
+            "function": "average",
+            "inputPath": ".payload.Pressure",
+            "outputPath": ".payload.Pressure"
+          },
+          {
+            "function": "average",
+            "inputPath": ".payload.Vibration",
+            "outputPath": ".payload.Vibration"
+          },
+          {
+            "function": "average",
+            "inputPath": ".payload.Speed",
+            "outputPath": ".payload.Speed"
+          }
+        ]
+      },
+      "output": {
+        "displayName": "MQ - 'Processed-Data/Silver/Aggregated' topic",
+        "type": "output/mqtt@v1",
+        "viewOptions": {
+          "position": {
+            "x": 0,
+            "y": 432
+          }
+        },
+        "broker": "tls://aio-mq-dmqtt-frontend:8883",
+        "qos": 1,
+        "authentication": {
+          "type": "serviceAccountToken"
+        },
+        "topic": {
+          "type": "static",
+          "value": "Processed-Data/Silver/Aggregated"
+        },
+        "format": {
+          "type": "json",
+          "path": ".payload"
+        },
+        "userProperties": [],
+        "retry": {
+          "type": "default"
+        }
+      }
+    },
+    "provisioningState": "Succeeded"
+  },
+  "name": "aggregate-data-silver",
+  "type": "microsoft.iotoperationsdataprocessor/instances/pipelines",
+  "location": "westeurope"
+}
