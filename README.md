@@ -1,6 +1,6 @@
 # smart-factory
-🤖 Discover my demo on the Smart Factory, enhanced by Gnerative AI.  
-🏭 See how the Smart Factory leverages generative AI to optimize its operations!  
+🤖 Discover my demo on the Smart Factory, enhanced by Generative AI.  
+🏭 See how the Smart Factory leverages Generative AI to optimize its operations!  
 🔍 We collect real-time data on operators, manufactured products, and machine maintenance schedules.  
 🗣️ Data is processed at Edge then in the Cloud, while the Semantic Kernel powers our conversational agent for smarter interactions.  
 
