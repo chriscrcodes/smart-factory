@@ -1,4 +1,4 @@
-# smart-factory
+# 🗣️ Talk to your Factory Demo
 🤖 Discover my demo on the Smart Factory, enhanced by Generative AI.  
 🏭 See how the Smart Factory leverages Generative AI to optimize its operations!  
 🔍 We collect real-time data on operators, manufactured products, and machine maintenance schedules.  
