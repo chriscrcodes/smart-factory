@@ -1,7 +1,7 @@
 {
-  "question1": "How many different products are we manufacturing? Please provide their names and the sites where they are produced.",
+  "question1": "Quels types de produits différents fabriquons-nous ? Veuillez indiquer leurs noms et les sites où ils sont produits.",
   "question2": "Could you give me a list of operators, the sites they are associated with, and their current shifts?",
-  "question3": "If I need to contact Operator Tom at the Austin Site, what is his phone number and email address?",
-  "question4": "I would like to get the list of Cells, Sites, Areas, and their Maintenance Status and Maintenance Date.",
+  "question3": "Si necesito ponerme en contacto con el operador Tom en las instalaciones de Austin, ¿cuál es su número de teléfono y su dirección de correo electrónico?",
+  "question4": "我想获得单元格、站点、区域及其维护状态和维护日期的列表。",
   "question5": "I want to calculate the yield for each site today, based on the total units produced and the good units produced. Please sort the results by yield percentage and product name."
 }
