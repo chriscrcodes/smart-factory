@@ -48,25 +48,27 @@ From Bronze (Edge/Simulator) ⇒ Silver (Edge/Azure IoT Operations Data Processo
 - **Semantic Kernel**: execute query in backend and return results.
 - **Streamlit**: provide the graphical user interface.
 
-## Solution Overview
-
 ## Pre-requisites
 
 ### Hardware Requirements
 
+1. **Resources**: 
+    - **CPU**: 4 vCPU
+    - **Memory**: 16GB
+    - **Storage**: 30GB
+
+2. **Operating System**: the solution requires a Linux-based system, specifically a VM or physical machine running **Linux Ubuntu 22.04**. This system will perform as an edge server, handling queries directly from the production line and interfacing with other operational systems.
+
 ### Software Requirements
 
-### Network Requirements
-
-#### Azure Arc for Kubernetes
-
-#### Control Plane
-
-#### Data Plane
+ - [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/): the Azure command-line interface.
+ - [K3s](https://k3s.io/): Lightweight Kubernetes distribution.
 
 ## Solution Build Steps
 
 ### Step 1 - Building an Ubuntu VM running Azure IoT Operations
+
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fchriscrcodes%2Fsmart-factory%2Frefs%2Fheads%2Fmain%2Fartifacts%2Ftemplates%2Fvm%2Fdeploy.json)
 
 ### Step 2 - Deploy the solution
 
