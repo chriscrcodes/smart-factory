@@ -19,11 +19,11 @@ From Bronze (Edge/Simulator) ⇒ Silver (Edge/Azure IoT Operations Data Processo
 
 ### Architecture Overview
 
-![Architecture Diagram](./assets/images/Talk%20to%20your%20Factory%20Demo%20-%20Solution%20Overview.png "Solution Overview")
+![Architecture Diagram](./artifacts/media/Talk%20to%20your%20Factory%20Demo%20-%20Solution%20Overview.png "Solution Overview")
 
 ### Key Components
 
-![Data Diagram](./assets/images/Edge-to-Cloud-Data%20Processing.png "Data Diagram")
+![Data Diagram](./artifacts/media/Edge-to-Cloud-Data%20Processing.png "Data Diagram")
 
 1. **Factory Simulator**  
     Simulates data coming from several factories: Berlin, Austin, Buffalo, Shanghai.  
@@ -41,7 +41,7 @@ From Bronze (Edge/Simulator) ⇒ Silver (Edge/Azure IoT Operations Data Processo
 
 ### Communication Flow
 
-![NLP Diagram](./assets/images/nlp.png "NLP Diagram")
+![NLP Diagram](./artifacts/media/nlp.png "NLP Diagram")
 
 - **User Prompt**: user asks a question to the Factory Agent.
 - **LLM**: analyze prompt and write the query to be executed in Fabric KQL Database.
