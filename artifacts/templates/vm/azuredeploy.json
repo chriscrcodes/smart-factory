@@ -11,7 +11,7 @@
     "parameters": {
       "vmName": {
         "type": "string",
-        "defaultValue": "simpleLinuxVM",
+        "defaultValue": "aiovm",
         "metadata": {
           "description": "The name of your Virtual Machine."
         }
@@ -48,11 +48,7 @@
       },
       "ubuntuOSVersion": {
         "type": "string",
-        "defaultValue": "Ubuntu-2004",
-        "allowedValues": [
-          "Ubuntu-2004",
-          "Ubuntu-2204"
-        ],
+        "defaultValue": "Ubuntu-2204",
         "metadata": {
           "description": "The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version."
         }
@@ -66,28 +62,28 @@
       },
       "vmSize": {
         "type": "string",
-        "defaultValue": "Standard_D2s_v3",
+        "defaultValue": "Standard_D4s_v3",
         "metadata": {
           "description": "The size of the VM"
         }
       },
       "virtualNetworkName": {
         "type": "string",
-        "defaultValue": "vNet",
+        "defaultValue": "vnet",
         "metadata": {
           "description": "Name of the VNET"
         }
       },
       "subnetName": {
         "type": "string",
-        "defaultValue": "Subnet",
+        "defaultValue": "subnet",
         "metadata": {
           "description": "Name of the subnet in the virtual network"
         }
       },
       "networkSecurityGroupName": {
         "type": "string",
-        "defaultValue": "SecGroupNet",
+        "defaultValue": "nsg",
         "metadata": {
           "description": "Name of the Network Security Group"
         }
@@ -106,12 +102,6 @@
     },
     "variables": {
       "imageReference": {
-        "Ubuntu-2004": {
-          "publisher": "Canonical",
-          "offer": "0001-com-ubuntu-server-focal",
-          "sku": "20_04-lts-gen2",
-          "version": "latest"
-        },
         "Ubuntu-2204": {
           "publisher": "Canonical",
           "offer": "0001-com-ubuntu-server-jammy",
@@ -197,6 +187,32 @@
                 "sourcePortRange": "*",
                 "destinationAddressPrefix": "*",
                 "destinationPortRange": "22"
+              }
+            },
+            {
+              "name": "MQTT",
+              "properties": {
+                "priority": 1001,
+                "protocol": "Tcp",
+                "access": "Allow",
+                "direction": "Inbound",
+                "sourceAddressPrefix": "*",
+                "sourcePortRange": "*",
+                "destinationAddressPrefix": "*",
+                "destinationPortRange": "8884"
+              }
+            },
+            {
+              "name": "Streamlit",
+              "properties": {
+                "priority": 1002,
+                "protocol": "Tcp",
+                "access": "Allow",
+                "direction": "Inbound",
+                "sourceAddressPrefix": "*",
+                "sourcePortRange": "*",
+                "destinationAddressPrefix": "*",
+                "destinationPortRange": "8501"
               }
             }
           ]
