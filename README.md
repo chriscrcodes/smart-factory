@@ -1,63 +1,63 @@
-# 🗣️ Talk to your Factory - Implementation Guide
+# 🗣️ Talk to your factory - implementation guide (work in progress)
 
 ## Introduction
-🤖 Discover my demo on the Smart Factory, enhanced by Generative AI.  
+🤖 Smart Factory demo, enhanced by Generative AI.  
 🏭 See how the Smart Factory leverages Generative AI to optimize its operations!  
-🔍 We collect real-time data on operators, manufactured products, and machine maintenance schedules.  
-🗣️ Data is processed at Edge then in the Cloud, while the Semantic Kernel powers our conversational agent for smarter interactions.  
+🔍 Real-time ingestion and processing of operations data (OT): operators, manufactured products, and machine maintenance schedules.  
+🗣️ Data processing: Edge and Cloud, with a Semantic Kernel to power the Factory Assistant, for smarter interactions.  
 
 [Video on the IoT Show](https://youtu.be/-AxWwJU_G_U?feature=shared), Demo starts at [19:54](https://youtu.be/-AxWwJU_G_U?feature=shared&t=1194)
 
-### Key Features and Benefits
+### Key features and benefits
 
-- **Data Processing**: Data is organized following a `Medallion Architecture`, with the goal of incrementally and progressively improving the structure and quality of data as it flows through each layer of the architecture.  
+- **Data Processing**: Data structure following a `Medallion Architecture`, with the goal of incrementally and progressively improving the structure and quality of data as it flows through each layer of the architecture.  
 From `Bronze` (Edge/Simulator) ⇒ `Silver` (Edge/Azure IoT Operations Data Processor) ⇒ `Gold` (Cloud/Fabric) layer tables.
 
-- **Natural Language Processing**: a Smart Assistant, enhanced by Generative AI, allow operators to ask complex questions about machine operations, staff, production quality, as if they were speaking to a human expert in the Factory.
+- **Natural Language Processing**: a Smart Assistant, enhanced by Generative AI, empowers operators, so they can ask complex questions about machine operations, staff, production quality, as if they were speaking to a human expert in the Factory.
 
 ## Architecture
 
-### Solution Architecture Overview
+### Solution architecture overview
 
 ![Architecture Diagram](./artifacts/media/architecture-overview.png "Solution Overview")
 
-### Factory Simulation
+### Factory simulation
 
 ![Factory Simulation](./artifacts/media/simulation.png "Factory Simulation")
 
-### Key Components
+### Key components
 
 ![Data Diagram](./artifacts/media/key-components.png "Data Diagram")
 
 1. **Factory Simulator**  
     Simulates data coming from several factories: Berlin, Austin, Buffalo, Shanghai.  
-    Data is sent to a MQTT topic with ISA95 structure: Enterprise/Site/Area/Line/Cell.  
-    (Industrial machines involved in the process are referred to as “Cells”).  
+    Factory simulator is publishing data to an Message Queuing Telemetry Transport (MQTT) broker topic based on the international standard from the International Society of Automation known as 'ISA-95' with the following format: Enterprise/Site/Area/Line/Cell.  
+    Industrial machines involved in the process are 'Cells.'  
 
 2. **Azure IoT Operations**  
     Processes data at Edge: normalize, contextualize, enrich with Edge reference datasets (Operator Data, Production Data) and aggregate every minute.
 
 3. **Azure Event Hub**  
-    Ingests data at scale in the Cloud.     
+    Data ingestion in Azure.     
     
 4. **Microsoft Fabric**  
-    Processes data in the Cloud: materialize data as a Table, enrich with Cloud reference datasets (Maintenance Data, Directory Data).
+    Processes data in Azure: materialize data as a Table, enrich with Cloud reference datasets (Maintenance Data, Directory Data).
 
-5. **GenAI Factory Agent**  
-    Introducing a custom LLM (Language Language Model) agent, based on GPT-4o, that enables natural language communication with the factory. This agent simplifies the process of retrieving information from various systems and databases.
+5. **Generative AI Factory Assistant**  
+    Introducing a custom Large Language Model (LLM) Factory Assistant, based on OpenAI model 'GPT-4o', that enables natural language communication with the factory. This assistant simplifies the process of retrieving information from various systems and databases.
 
-### Communication Flow
+### Communication flow
 
-![NLP Diagram](./artifacts/media/agent-communication-flow.png "NLP Diagram")
+![Factory Assistant Communication Flow](./artifacts/media/factory-assistant-communication-flow.png "Factory Assistant Communication Flow")
 
-- **User Prompt**: user asks a question to the Factory Agent.
-- **Custom LLM (Language Language Model) agent**: analyze prompt and write the query to be executed in Fabric KQL Database.
-- **Semantic Kernel**: execute query in background (Kusto Language) and return results.
-- **Streamlit**: provide the graphical user interface.
+- **User Prompt**: user asks a question to the Factory Assistant.
+- **Custom LLM Large Language Model (LLM) Factory Assistant**: analyze prompt and write the statement to query the Database in Fabric.
+- **Semantic Kernel**: execute query in background and return results (Python code).
+- **Web Application**: provide the graphical user interface (based on the open-source framework 'Streamlit').
 
 ## Pre-requisites
 
-### Hardware Requirements
+### Hardware requirements
 
 1. **Resources**: 
     - **CPU**: 4 vCPU
@@ -66,26 +66,26 @@ From `Bronze` (Edge/Simulator) ⇒ `Silver` (Edge/Azure IoT Operations Data Proc
 
 2. **Operating System**: the solution requires a Linux-based system, specifically a VM or physical machine running **Linux Ubuntu 22.04**. This system will perform as an edge server, handling queries directly from the production line and interfacing with other operational systems.
 
-### Software Requirements
+### Software requirements
 
  - [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/) the Azure command-line interface.
  - [K3s](https://k3s.io/) Lightweight Kubernetes. Easy to install, half the memory, all in a binary of less than 100 MB.
  - [curl](https://curl.se/) command line tool that developers use to transfer data to and from a server.
 
-### Cloud Services Requirements
+### Cloud services requirements
 
  - Azure Subscription (with Contributor rights)
     - Resource Group
     - Key Vault
     - Event Hub
     - Azure Open AI Service
-    - Virtual Machine (if you want to test everything in the Cloud)
+    - Virtual Machine (if you want to test everything in Azure Cloud)
  - Microsoft Fabric Tenant (you can try it for free [here](https://www.microsoft.com/en-us/microsoft-fabric/getting-started?msockid=27cd43526f4e6b2a1fa857d06e486a3c))
 
-## Solution Build Steps
+## Solution build steps
 
-### Step 1 - Provision Azure Resources
-   - We will use the [Azure Cloud Shell (Bash)](https://learn.microsoft.com/en-us/azure/cloud-shell/get-started/ephemeral?tabs=azurecli#start-cloud-shell) to provision resources in Azure Cloud 
+### Step 1 - provision Azure resources
+   - Use the [Azure Cloud Shell (Bash)](https://learn.microsoft.com/en-us/azure/cloud-shell/get-started/ephemeral?tabs=azurecli#start-cloud-shell) to provision resources in Azure Cloud 
    - Set Environment Variables:
      ```bash
      export SUBSCRIPTION_ID=<YOUR_SUBSCRIPTION_ID>
@@ -100,7 +100,7 @@ From `Bronze` (Edge/Simulator) ⇒ `Silver` (Edge/Azure IoT Operations Data Proc
      ```bash
      az account set -s $SUBSCRIPTION_ID
      ```
-   - Register required Resource Providers (this step only needs to be run once per subscription):
+   - Register required Resource Providers (execute this step only once per subscription):
      ```bash
      az provider register -n "Microsoft.ExtendedLocation"
      az provider register -n "Microsoft.Kubernetes"
@@ -117,7 +117,7 @@ From `Bronze` (Edge/Simulator) ⇒ `Silver` (Edge/Azure IoT Operations Data Proc
      ```bash
      az keyvault create --enable-rbac-authorization false --name $KEYVAULT_NAME --resource-group $RESOURCE_GROUP
      ```
-   - Create an Event Hub namespace:
+   - Create an Event Hub name space:
      ```bash
      az eventhubs namespace create --name $EVENTHUB_NAMESPACE --resource-group $RESOURCE_GROUP --location $LOCATION
      ```
@@ -134,9 +134,9 @@ From `Bronze` (Edge/Simulator) ⇒ `Silver` (Edge/Azure IoT Operations Data Proc
 
       **Note:** `Standard_D4s_v3` is the recommended size for the Azure VM.
 
-### Step 2 - Deploy the Solution `(Edge)`
+### Step 2 - Deploy the solution `(Edge)`
 
-#### Prepare Cluster
+#### Prepare cluster
 
 [Azure IoT Operations Official Documentation](https://learn.microsoft.com/en-us/azure/iot-operations/deploy-iot-ops/howto-prepare-cluster?tabs=ubuntu#create-a-cluster)
 
@@ -151,7 +151,7 @@ From `Bronze` (Edge/Simulator) ⇒ `Silver` (Edge/Azure IoT Operations Data Proc
      ```bash
      curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
      ```
-   - Install `Azure IoT Operations extension` (we choose version v0.5.1b1 to use the Data Processor component):
+   - Install `Azure IoT Operations extension` (v0.5.1b1, to be able to use the Data Processor component):
      ```bash
      az extension add --name azure-iot-ops --version 0.5.1b1
      ```
@@ -161,7 +161,7 @@ From `Bronze` (Edge/Simulator) ⇒ `Silver` (Edge/Azure IoT Operations Data Proc
      ```bash
      curl -sfL https://get.k3s.io | sh –
      ```
-   - Create a `K3s configuration` yaml file in `.kube/config`:
+   - Create a `K3s configuration` file in `.kube/config`:
      ```bash
      mkdir ~/.kube
      sudo KUBECONFIG=~/.kube/config:/etc/rancher/k3s/k3s.yaml kubectl config view --flatten > ~/.kube/merged
@@ -182,7 +182,7 @@ From `Bronze` (Edge/Simulator) ⇒ `Silver` (Edge/Azure IoT Operations Data Proc
      sudo sysctl -p
      ```
 
-#### Connect Cluster to Azure
+#### Connect cluster to Azure
 
 [Azure IoT Operations Official Documentation](https://learn.microsoft.com/en-us/azure/iot-operations/deploy-iot-ops/howto-prepare-cluster?tabs=ubuntu#arc-enable-your-cluster)
 
@@ -220,7 +220,7 @@ From `Bronze` (Edge/Simulator) ⇒ `Silver` (Edge/Azure IoT Operations Data Proc
      az iot ops verify-host
      ```
 
-- **Deploy Azure IoT Operations** (we choose version v0.5.1b1 to use the Data Processor component)
+- **Deploy Azure IoT Operations**
    - Deploy Azure IoT Operations:
      ```bash
      az iot ops init --kubernetes-distro k3s --include-dp --simulate-plc --cluster $CLUSTER_NAME --resource-group $RESOURCE_GROUP --kv-id /subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.KeyVault/vaults/$KEY_VAULT_NAME
@@ -233,9 +233,9 @@ From `Bronze` (Edge/Simulator) ⇒ `Silver` (Edge/Azure IoT Operations Data Proc
       ```
 
 - **Azure IoT Operations Dashboard - Configure Data Pipelines**
-    - Launch the [Azure IoT Operations Dashboard](https://iotoperations.azure.com/)
+    - Go to the [Azure IoT Operations Dashboard](https://iotoperations.azure.com/)
     - Go to 'Data pipelines' > 'Reference datasets' > 'Create reference dataset'
-    - We will now create `2 reference datasets`
+    - Create `2 reference datasets`
       1. Create a reference dataset:
           - Name: `operations-data`
           - Properties > Add property
@@ -250,9 +250,9 @@ From `Bronze` (Edge/Simulator) ⇒ `Silver` (Edge/Azure IoT Operations Data Proc
             - Property Path: `.Cell`
             - Primary key: `Yes`
             - Create
-    - **Note**: the reference datasets will allow us to enrich data at the Edge with datasets only available at Edge (MES Factory scenario).
+    - **Note**: the reference datasets will enable data enrichment at the Edge with datasets only available at Edge (Manufacturing Execution System (MES) Factory scenario).
 
-    - We will now create `4 data pipelines`      
+    - Create `4 data pipelines`      
       1. Go back on 'Data pipelines' > 'Create pipeline'
           - Click on `<pipeline name>`, choose a name 'refresh-dataset-operations' and click 'Apply'
           - 'Import' > choose the file [refresh-dataset-operations.json](./artifacts/templates/azure-iot-operations/data-processor/pipelines/refresh-dataset-operations.json)
@@ -269,10 +269,10 @@ From `Bronze` (Edge/Simulator) ⇒ `Silver` (Edge/Azure IoT Operations Data Proc
           - Click on `<pipeline name>`, choose a name 'aggregate-data-silver' and click 'Apply'
           - 'Import' > choose the file [aggregate-data-silver.json](./artifacts/templates/azure-iot-operations/data-processor/pipelines/aggregate-data-silver.json)
           - Click 'Save'
-    - **Note**: the data pipelines will allow us to process the data, coming from the Factory Simulator, entirely at Edge.
+    - **Note**: the data pipelines will enable data processing, with data coming from the Factory Simulator, entirely at Edge.
 
-### Step 3 - Deploy the Solution `(Cloud)`
+#### Deploy Kubernetes pods
 
-
+### Step 3 - Deploy the solution
 
 ## Conclusion
