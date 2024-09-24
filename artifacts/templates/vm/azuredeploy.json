@@ -188,6 +188,32 @@
                 "destinationAddressPrefix": "*",
                 "destinationPortRange": "22"
               }
+            },
+            {
+              "name": "MQTT",
+              "properties": {
+                "priority": 1001,
+                "protocol": "Tcp",
+                "access": "Allow",
+                "direction": "Inbound",
+                "sourceAddressPrefix": "*",
+                "sourcePortRange": "*",
+                "destinationAddressPrefix": "*",
+                "destinationPortRange": "8884"
+              }
+            },
+            {
+              "name": "Streamlit",
+              "properties": {
+                "priority": 1002,
+                "protocol": "Tcp",
+                "access": "Allow",
+                "direction": "Inbound",
+                "sourceAddressPrefix": "*",
+                "sourcePortRange": "*",
+                "destinationAddressPrefix": "*",
+                "destinationPortRange": "8501"
+              }
             }
           ]
         }
