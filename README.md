@@ -134,7 +134,7 @@ From `Bronze` (Edge/Simulator) ⇒ `Silver` (Edge/Azure IoT Operations Data Proc
 
       **Note:** `Standard_D4s_v3` is the recommended size for the Azure VM.
 
-### Step 2 - Deploy the solution `(Edge)`
+### Step 2 - Deploy the solution (Edge)
 
 #### Prepare cluster
 
@@ -273,6 +273,13 @@ From `Bronze` (Edge/Simulator) ⇒ `Silver` (Edge/Azure IoT Operations Data Proc
 
 #### Deploy Kubernetes pods
 
-### Step 3 - Deploy the solution
+Set up continuous deployment to your cluster using GitOps.
+
+- **Create a GitOps configuration**
+
+
+
+
+### Step 3 - Deploy the solution (Cloud)
 
 ## Conclusion
