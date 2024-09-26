@@ -8,7 +8,7 @@ spec:
   routes:
     - mqttToKafka:
         name: "AIO Silver Aggregated to Event Hub"
-        mqttTopic: Processed-Data/Silver/Aggregated
-        kafkaTopic: aio-silver-aggregated
+        mqttTopic: "Processed-Data/Silver/Aggregated"
+        kafkaTopic: "<your_eventhub>"
         kafkaAcks: one
         qos: 1

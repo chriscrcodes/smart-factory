@@ -11,8 +11,7 @@ User input message is: {{$request}}
 
 [INSTRUCTIONS]
 1. If I don't formulate a question, return an error message explaining that the question is not related to querying Data coming from your Factory, don't return details about the table or schema.
-2. The input {{$request}} must match the table schema {{$schema}}.
+2. If the input {{$request}} does not match the table schema {{$schema}}, return a short error message.
 3. If you find the query, prefix it with "RESPONSE_START" and suffix it by "RESPONSE_END".
 4. Limit the results of the query to 100, return distinct values.
-5. If the input {{$request}} does not match the table schema {{$schema}}, return a short error message.
 [END INSTRUCTIONS]
