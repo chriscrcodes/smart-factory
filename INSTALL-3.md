@@ -1,4 +1,4 @@
-### Step 3 - Configure the solution (Cloud part)
+### Part 3 - Configure the solution (Cloud part)
 
 #### Start a new Microsoft Fabric trial
 

@@ -59,12 +59,12 @@ From `Bronze` (Edge/Simulator) ⇒ `Silver` (Edge/Azure IoT Operations Data Proc
 
 ### Hardware requirements
 
-1. **Resources**: 
+- **Resources**: 
     - CPU: `4 vCPU`
     - Memory: `16GB`
     - Storage: `30GB`
 
-2. **Operating System**: the solution requires a Linux-based system, specifically a VM or physical machine running Linux Ubuntu 22.04. This system will perform as an Edge server, handling queries directly from the production line and interfacing with other operational systems.
+- **Operating System**: the solution requires a Linux-based system, specifically a VM or physical machine running `Linux Ubuntu 22.04`. This system will perform as an Edge server, handling queries directly from the production line and interfacing with other operational systems.
 
 ### Software requirements
 
@@ -85,9 +85,10 @@ From `Bronze` (Edge/Simulator) ⇒ `Silver` (Edge/Azure IoT Operations Data Proc
 
 ## Solution build steps
 
-- #### [Step 1 - Provision resources (Edge and Cloud)](./INSTALL-1.md)
-- #### [Step 2 - Connect your Edge platform to Cloud platform](./INSTALL-2.md)
-- #### [Step 3 - Configure the solution (Cloud part)](./INSTALL-3.md)
+1. [Provision resources (Edge and Cloud)](./INSTALL-1.md)
+2. [Connect your Edge platform to Cloud platform](./INSTALL-2.md)
+3. [Configure the solution (Cloud part)](./INSTALL-3.md) (work in progress)
+4. Deploy and use the Generative AI Factory Assistant (work in progress)
 
 ## Demo
 
