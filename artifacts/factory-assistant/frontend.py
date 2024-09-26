@@ -43,11 +43,13 @@ question_list = [q for q in example_questions.values()]
 st.set_page_config(
     page_title=config['streamlit']['tab_title']
 )
-st.image(config['streamlit']['logo'], width=400)
-st.caption(config['streamlit']['caption'])
+
+left_co, cent_co,last_co = st.columns(3)
+with cent_co:
+    st.image(config['streamlit']['logo'], width=400)
+st.title(config['streamlit']['title'])
 
 # Set sidebar
-st.sidebar.title("About")
 st.sidebar.info(config['streamlit']['about'])
 reset = st.sidebar.button("Reset Chat", on_click=clear_input)
 
