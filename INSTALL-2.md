@@ -1,9 +1,10 @@
-### Step 2 - Connect your Edge platform to Cloud platform
+### Part 2 - Connect your Edge platform to Cloud platform
    - Login and execute the following commands on your Ubuntu Machine
    - Connect to Azure (you need to have [Contributor permissions](https://learn.microsoft.com/en-us/azure/iot-operations/deploy-iot-ops/howto-deploy-iot-operations?tabs=cli#prerequisites) on your Azure Subscription):
      ```bash
-     az login
+     az login --use-device-code
      ```
+   - Sign in with your account credentials in the browser (from another computer) and enter the code
    - Set Environment Variables:
      ```bash
      export SUBSCRIPTION_ID=<YOUR_SUBSCRIPTION_ID>

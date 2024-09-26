@@ -1,4 +1,4 @@
-### Step 1 - Provision resources (Edge and Cloud)
+### Part 1 - Provision resources (Edge and Cloud)
 
 #### Prepare and provision Cloud platform
    - Use the [Azure Cloud Shell (Bash)](https://learn.microsoft.com/en-us/azure/Cloud-shell/get-started/ephemeral?tabs=azurecli#start-Cloud-shell) to provision resources in Azure Cloud 
@@ -74,7 +74,7 @@
 - Install K3s
    - Run the `K3s installation script`:
      ```bash
-     curl -sfL https://get.k3s.io | sh –
+     curl -sfL https://get.k3s.io | sh -
      ```
    - Create a `K3s configuration` file in `.kube/config`:
      ```bash
@@ -96,3 +96,7 @@
      echo fs.file-max = 100000 | sudo tee -a /etc/sysctl.conf
      sudo sysctl -p
      ```
+- Check k3s installation
+  ```bash
+  kubectl get node
+  ```
