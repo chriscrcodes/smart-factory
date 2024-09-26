@@ -50,10 +50,10 @@ From `Bronze` (Edge/Simulator) ⇒ `Silver` (Edge/Azure IoT Operations Data Proc
 
 ![Factory Assistant Communication Flow](./artifacts/media/factory-assistant-communication-flow.png "Factory Assistant Communication Flow")
 
-- User Prompt: user asks a question to the Factory Assistant.
-- Custom LLM Large Language Model (LLM) Factory Assistant: analyze prompt and write the statement to query the Database in Fabric.
-- Semantic Kernel: execute query in background and return results (Python code).
-- Web Application: provide the graphical user interface (based on the open-source framework 'Streamlit').
+- **User Prompt**: user asks a question to the Factory Assistant.
+- **Custom Large Language Model (LLM) Factory Assistant**: analyze prompt and write the statement to query the Database in Fabric.
+- **Semantic Kernel**: execute query in background and return results (Python code).
+- **Web Application**: provide the graphical user interface (based on the open-source framework 'Streamlit').
 
 ## Prerequisites
 
@@ -85,9 +85,9 @@ From `Bronze` (Edge/Simulator) ⇒ `Silver` (Edge/Azure IoT Operations Data Proc
 
 ## Solution build steps
 
-- [Step 1 - Provision resources (Edge and Cloud)](./INSTALL-1.md)
-- [Step 2 - Connect your Edge platform to Cloud platform](./INSTALL-2.md)
-- [Step 3 - Configure the solution (Cloud part)](./INSTALL-3.md)
+- #### [Step 1 - Provision resources (Edge and Cloud)](./INSTALL-1.md)
+- #### [Step 2 - Connect your Edge platform to Cloud platform](./INSTALL-2.md)
+- #### [Step 3 - Configure the solution (Cloud part)](./INSTALL-3.md)
 
 ## Demo
 
