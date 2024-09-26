@@ -85,9 +85,9 @@ From `Bronze` (Edge/Simulator) ⇒ `Silver` (Edge/Azure IoT Operations Data Proc
 
 ## Solution build steps
 
-#### 1. [Provision resources (Edge and Cloud)](./INSTALL-1.md)
-#### 2. [Connect your Edge platform to Cloud platform](./INSTALL-2.md)
-#### 3. [Configure the solution (Cloud part)](./INSTALL-3.md)
+1. [Provision resources (Edge and Cloud)](./INSTALL-1.md)
+2. [Connect your Edge platform to Cloud platform](./INSTALL-2.md)
+3. [Configure the solution (Cloud part)](./INSTALL-3.md)
 
 ## Demo
 
