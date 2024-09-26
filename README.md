@@ -59,12 +59,12 @@ From `Bronze` (Edge/Simulator) ⇒ `Silver` (Edge/Azure IoT Operations Data Proc
 
 ### Hardware requirements
 
-1. **Resources**: 
+- **Resources**: 
     - CPU: `4 vCPU`
     - Memory: `16GB`
     - Storage: `30GB`
 
-2. **Operating System**: the solution requires a Linux-based system, specifically a VM or physical machine running Linux Ubuntu 22.04. This system will perform as an Edge server, handling queries directly from the production line and interfacing with other operational systems.
+- **Operating System**: the solution requires a Linux-based system, specifically a VM or physical machine running `Linux Ubuntu 22.04`. This system will perform as an Edge server, handling queries directly from the production line and interfacing with other operational systems.
 
 ### Software requirements
 

@@ -1,25 +1,34 @@
 ### Part 2 - Connect your Edge platform to Cloud platform
    - Login and execute the following commands on your Ubuntu Machine
-   - Connect to Azure (you need to have [Contributor permissions](https://learn.microsoft.com/en-us/azure/iot-operations/deploy-iot-ops/howto-deploy-iot-operations?tabs=cli#prerequisites) on your Azure Subscription):
+   - Retrieve the environment variables you defined in [Part 1 - Provision resources (Edge and Cloud)](./INSTALL-1.md) ==> **Checkpoint (2)**:
      ```bash
-     az login --use-device-code
+     export APP_ID="<appId>"
+     export APP_SECRET="<password>"
+     export TENANT="<tenant>"
+     export OBJECT_ID="<YOUR_AZURE_ARC_OBJECT_ID>"
+     export SUBSCRIPTION_ID="<YOUR_SUBSCRIPTION_ID>"
+     export LOCATION="<YOUR_REGION>"
+     export RESOURCE_GROUP="<YOUR_RESOURCE_GROUP>"
+     export KEYVAULT_NAME="<YOUR_KEYVAULT_NAME>"
+     export EVENTHUB_NAMESPACE="<YOUR_EVENTHUB_NAMESPACE>"
+     export EVENTHUB_NAME="<YOUR_EVENTHUB_NAME>"
+     export AZURE_OPENAI_NAME="<YOUR_AZURE_OPENAI_NAME>"
      ```
-   - Sign in with your account credentials in the browser (from another computer) and enter the code
-   - Set Environment Variables:
+   - Add an additional environment variable to define the name of the cluster to connect to Azure Arc:
      ```bash
-     export SUBSCRIPTION_ID=<YOUR_SUBSCRIPTION_ID>
-     export LOCATION=<YOUR_REGION>
-     export RESOURCE_GROUP=<YOUR_RESOURCE_GROUP>
-     export CLUSTER_NAME=<YOUR_CLUSTER_NAME>
-     export KEY_VAULT_NAME=<YOUR_KEY_VAULT_NAME>
+     export CLUSTER_NAME="<YOUR_CLUSTER_NAME>"
+     ```
+   - Connect to Azure (using the service principal created in [Part 1 - Provision resources (Edge and Cloud)](./INSTALL-1.md)
+     ```bash
+     az login --service-principal -u $APP_ID -p $APP_SECRET --tenant $TENANT
+     ```
+   - Set Azure Subscription context:
+     ```bash
+     az account set -s $SUBSCRIPTION_ID
      ```
    - Connect Kubernetes Cluster to Azure:
      ```bash
      az connectedk8s connect -n $CLUSTER_NAME -l $LOCATION -g $RESOURCE_GROUP --subscription $SUBSCRIPTION_ID
-     ```
-   - Get `objectId` of Microsoft Entra ID application:
-     ```bash
-     export OBJECT_ID=$(az ad sp show --id bc313c14-388c-4e7d-a58e-70017303ee3b --query id -o tsv)
      ```
    - Enable Custom Location support:
      ```bash
@@ -27,6 +36,8 @@
      ```
 
 #### Deploy and configure Azure IoT Operations
+
+- Check [Azure IoT Operations prerequisites](https://learn.microsoft.com/en-us/azure/iot-operations/deploy-iot-ops/howto-deploy-iot-operations?tabs=cli#prerequisites)
 
 - Prepare your Cluster for Azure IoT Operations
    - Validate Cluster readiness for Azure IoT Operations:
