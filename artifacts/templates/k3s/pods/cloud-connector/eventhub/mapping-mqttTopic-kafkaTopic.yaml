@@ -7,8 +7,8 @@ spec:
   kafkaConnectorRef: bridge-eventhub
   routes:
     - mqttToKafka:
-        name: "<Your_mapping_name>"
-        mqttTopic: "<Your_MQTT_Topic>"
-        kafkaTopic: "<Your_Event_Hub>"
+        name: "AIO Silver Aggregated to Event Hub"
+        mqttTopic: "Processed-Data/Silver/Aggregated"
+        kafkaTopic: "<your_eventhub>"
         kafkaAcks: one
         qos: 1
