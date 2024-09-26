@@ -87,7 +87,8 @@ From `Bronze` (Edge/Simulator) ⇒ `Silver` (Edge/Azure IoT Operations Data Proc
 
 1. [Provision resources (Edge and Cloud)](./INSTALL-1.md)
 2. [Connect your Edge platform to Cloud platform](./INSTALL-2.md)
-3. [Configure the solution (Cloud part)](./INSTALL-3.md)
+3. [Configure the solution (Cloud part)](./INSTALL-3.md) (work in progress)
+4. Deploy and use the Generative AI Factory Assistant (work in progress)
 
 ## Demo
 
