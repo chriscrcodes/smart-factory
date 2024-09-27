@@ -72,6 +72,7 @@ From `Bronze` (Edge/Simulator) ⇒ `Silver` (Edge/Azure IoT Operations Data Proc
  - [`K3s`](https://k3s.io/) Lightweight Kubernetes. Easy to install, half the memory, all in a binary of less than 100 MB.
  - [`curl`](https://curl.se/) command line tool that developers use to transfer data to and from a server.
  - [`nano`](https://www.nano-editor.org/) text editor.
+ - [`jq`](https://github.com/jqlang/jq) command-line JSON processor.
 
 ### Cloud services requirements
 
@@ -87,8 +88,8 @@ From `Bronze` (Edge/Simulator) ⇒ `Silver` (Edge/Azure IoT Operations Data Proc
 
 1. [Provision resources (Edge and Cloud)](./INSTALL-1.md)
 2. [Connect your Edge platform to Cloud platform](./INSTALL-2.md)
-3. [Configure the solution (Cloud part)](./INSTALL-3.md) (work in progress)
-4. Deploy and use the Generative AI Factory Assistant (work in progress)
+3. [Configure the solution (Cloud part)](./INSTALL-3.md)
+4. [Deploy and use the Generative AI Factory Assistant](./INSTALL-4.md)
 
 ## Demo
 

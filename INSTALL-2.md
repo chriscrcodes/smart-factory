@@ -1,20 +1,19 @@
 ### Part 2 - Connect your Edge platform to Cloud platform
    - Login and execute the following commands on your Ubuntu Machine
-   - Retrieve the environment variables you defined in [Part 1 - Provision resources (Edge and Cloud)](./INSTALL-1.md) ==> **Checkpoint (2)**:
+   - Retrieve the environment following variables you defined in [Part 1 - Provision resources (Edge and Cloud)](./INSTALL-1.md) ==> **Note(2)**:
      ```bash
-     export APP_ID="<appId>"
-     export APP_SECRET="<password>"
-     export TENANT="<tenant>"
-     export OBJECT_ID="<YOUR_AZURE_ARC_OBJECT_ID>"
-     export SUBSCRIPTION_ID="<YOUR_SUBSCRIPTION_ID>"
-     export LOCATION="<YOUR_REGION>"
-     export RESOURCE_GROUP="<YOUR_RESOURCE_GROUP>"
-     export KEYVAULT_NAME="<YOUR_KEYVAULT_NAME>"
-     export EVENTHUB_NAMESPACE="<YOUR_EVENTHUB_NAMESPACE>"
-     export EVENTHUB_NAME="<YOUR_EVENTHUB_NAME>"
-     export AZURE_OPENAI_NAME="<YOUR_AZURE_OPENAI_NAME>"
+     $APP_ID
+     $APP_SECRET
+     $TENANT
+     $OBJECT_ID
+     $SUBSCRIPTION_ID
+     $LOCATION
+     $RESOURCE_GROUP
+     $KEYVAULT_NAME
+     $EVENTHUB_NAMESPACE
+     $EVENTHUB_NAME
      ```
-   - Add an additional environment variable to define the name of the cluster to connect to Azure Arc:
+   - Create 1 environment variable to define the name of the cluster to connect to Azure Arc:
      ```bash
      export CLUSTER_NAME="<YOUR_CLUSTER_NAME>"
      ```
@@ -28,11 +27,11 @@
      ```
    - Connect Kubernetes Cluster to Azure:
      ```bash
-     az connectedk8s connect -n $CLUSTER_NAME -l $LOCATION -g $RESOURCE_GROUP --subscription $SUBSCRIPTION_ID
+     az connectedk8s connect --name $CLUSTER_NAME --location $LOCATION --resource-group $RESOURCE_GROUP --subscription $SUBSCRIPTION_ID
      ```
    - Enable Custom Location support:
      ```bash
-     az connectedk8s enable-features -n $CLUSTER_NAME -g $RESOURCE_GROUP --custom-locations-oid $OBJECT_ID --features cluster-connect custom-locations
+     az connectedk8s enable-features --name $CLUSTER_NAME --resource-group $RESOURCE_GROUP --custom-locations-oid $OBJECT_ID --features cluster-connect custom-locations
      ```
 
 #### Deploy and configure Azure IoT Operations (v0.5.1b1)
@@ -59,7 +58,7 @@
 - Deploy Azure IoT Operations
    - Deploy Azure IoT Operations:
      ```bash
-     az iot ops init --kubernetes-distro k3s --include-dp --simulate-plc --cluster $CLUSTER_NAME --resource-group $RESOURCE_GROUP --kv-id /subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.KeyVault/vaults/$KEY_VAULT_NAME
+     az iot ops init --kubernetes-distro k3s --include-dp --simulate-plc --cluster $CLUSTER_NAME --resource-group $RESOURCE_GROUP --kv-id /subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.KeyVault/vaults/$KEYVAULT_NAME
      ```
 
 - Confirm Azure IoT Operations installation  
@@ -73,12 +72,12 @@
 
 - Azure IoT Operations Dashboard - Configure Data Pipelines
     - Go to the [Azure IoT Operations Dashboard](https://iotoperations.azure.com/)
-    - Click on 'Get Started', select your site or 'Unassigned instances' and select your instance
-    - Go to 'Data pipelines' > 'Reference datasets' > 'Create reference dataset'
+    - Click on `Get Started`, select your site or `Unassigned instances` and select your instance
+    - Go to `Data pipelines` > `Reference datasets` > `Create reference dataset`
     - Create `2 reference datasets`
       1. Create a reference dataset:
           - Name: `operations-data`
-          - Properties > Add property
+          - `Properties` > `Add property`
             - Property name: `Shift`
             - Property Path: `.Shift`
             - Primary key: `Yes`
@@ -86,7 +85,7 @@
           ![aio-dp-op](./artifacts/media/dp-rd-operations.png "aio-dp-op")
       2. Create a reference dataset:
           - Name: `production-data`
-          - Properties > Add property
+          - `Properties` > `Add property`
             - Property name: `Cell`
             - Property Path: `.Cell`
             - Primary key: `Yes`
@@ -96,22 +95,22 @@
     ![aio-dp-rd](./artifacts/media/dp-rd.png "aio-dp-rd")
 
     - Create `4 data pipelines`      
-      1. Go back on 'Data pipelines' > 'Create pipeline'
-          - Click on `<pipeline name>`, choose a name 'refresh-dataset-operations' and click 'Apply'
-          - 'Import' > choose the file [refresh-dataset-operations.json](./artifacts/templates/azure-iot-operations/data-processor/pipelines/refresh-dataset-operations.json)
-          - Click 'Save'
-      2. Go back on 'Data pipelines' > 'Create pipeline'
-          - Click on `<pipeline name>`, choose a name 'refresh-dataset-production' and click 'Apply'
-          - 'Import' > choose the file [refresh-dataset-production.json](./artifacts/templates/azure-iot-operations/data-processor/pipelines/refresh-dataset-production.json)
-          - Click 'Save'
-      3. Go back on 'Data pipelines' > 'Create pipeline'
-          - Click on `<pipeline name>`, choose a name 'refine-data-silver' and click 'Apply'
-          - 'Import' > choose the file [refine-data-silver.json](./artifacts/templates/azure-iot-operations/data-processor/pipelines/refine-data-silver.json)
-          - Click 'Save'
-      4. Go back on 'Data pipelines' > 'Create pipeline'
-          - Click on `<pipeline name>`, choose a name 'aggregate-data-silver' and click 'Apply'
-          - 'Import' > choose the file [aggregate-data-silver.json](./artifacts/templates/azure-iot-operations/data-processor/pipelines/aggregate-data-silver.json)
-          - Click 'Save'
+      1. Go back on `Data pipelines` > `Create pipeline`
+          - Click on `<pipeline name>`, choose a name 'refresh-dataset-operations' and click `Apply`
+          - `Import` > choose the file [refresh-dataset-operations.json](./artifacts/templates/azure-iot-operations/data-processor/pipelines/refresh-dataset-operations.json)
+          - Click `Save`
+      2. Go back on `Data pipelines` > `Create pipeline`
+          - Click on `<pipeline name>`, choose a name 'refresh-dataset-production' and click `Apply`
+          - `Import` > choose the file [refresh-dataset-production.json](./artifacts/templates/azure-iot-operations/data-processor/pipelines/refresh-dataset-production.json)
+          - Click `Save`
+      3. Go back on `Data pipelines` > `Create pipeline`
+          - Click on `<pipeline name>`, choose a name 'refine-data-silver' and click `Apply`
+          - `Import` > choose the file [refine-data-silver.json](./artifacts/templates/azure-iot-operations/data-processor/pipelines/refine-data-silver.json)
+          - Click `Save`
+      4. Go back on `Data pipelines` > `Create pipeline`
+          - Click on `<pipeline name>`, choose a name 'aggregate-data-silver' and click `Apply`
+          - `Import` > choose the file [aggregate-data-silver.json](./artifacts/templates/azure-iot-operations/data-processor/pipelines/aggregate-data-silver.json)
+          - Click `Save`
     - **Note**: the data pipelines will enable data processing, with data coming from the Factory Simulator, entirely at Edge.  
     ![aio-dp](./artifacts/media/dp-pipelines.png "aio-dp")
 
@@ -193,17 +192,17 @@
 
   - Authorize the cluster to connect to the event hub
     - Locate the Azure Event Hub name space you created in [Azure Portal](https://portal.azure.com/)
-    - Access Control (IAM) > Add > Add role assignment
-    - `Azure Event Hubs Data Sender` > Next
+    - `Access Control (IAM)` > `Add` > `Add role assignment`
+    - `Azure Event Hubs Data Sender` > `Next`
     - Assign access to `User, group, or service principal`
-    - Select Members > type `mq` to locate the `MQTT` extension used by Azure IoT Operations  
+    - `Select Members` > type `mq` to locate the `MQTT` extension used by Azure IoT Operations  
       (For example: `/subscriptions/xxx/resourceGroups/xxx/providers/Microsoft.Kubernetes/connectedClusters/xxx/providers/Microsoft.KubernetesConfiguration/extensions/mq-xxx`)
     - Repeat the same steps for the role `Azure Event Hubs Data Receiver`
 
   - Confirm data flowing from Edge to Cloud
     - Locate the Azure Event Hub name space you created in [Azure Portal](https://portal.azure.com/)
     - Data Explorer (preview) > select the event hub you created in [Step 1](#step-1---provision-azure-resources) (`$EVENTHUB_NAME` variable)
-    - Click on 'View events' > and select and event on the right to confirm data flow is operational  
+    - Click on `View events` > and select an event on the right to confirm data flow is operational  
     ![evh-messages](./artifacts/media/evh-messages.png "evh-messages")
 
-  - You can now continue to [Part 3 - Configure the solution (Cloud part)](./INSTALL-3.md)
+  - **You can now continue to** > [Part 3 - Configure the solution (Cloud part)](./INSTALL-3.md)

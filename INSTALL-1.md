@@ -13,22 +13,32 @@
      export EVENTHUB_NAME="<YOUR_EVENTHUB_NAME>"
      export AZURE_OPENAI_NAME="<YOUR_AZURE_OPENAI_NAME>"
      ```
-     **Checkpoint (1)**: **keep a note of the environment variables for future use**.
+     **Note(1)**: **keep a note of the environment variables for future use**.
    - Set Azure Subscription context:
      ```bash
      az account set -s $SUBSCRIPTION_ID
      ```
    - Create a service principal (service account) to manage Azure:
      ```bash
-      az ad sp create-for-rbac -n AIO_SP_Contrib --role Contributor --scopes /subscriptions/$SUBSCRIPTION_ID
+     SPN=$(az ad sp create-for-rbac -n AIO_SP_Contrib --role Contributor --scopes /subscriptions/$SUBSCRIPTION_ID)
      ```
-      **Checkpoint (2)**: create variables with: `appId`, `password` and `tenant`, from the output of the command, and **keep a note of them for future use**.
+      **Note(2)**: create 3 variables with: `appId`, `password` and `tenant`, from the output of the command, and **keep a note of them for future use**.
      ```bash
-     export APP_ID="<appId>"
-     export APP_SECRET="<password>"
-     export TENANT="<tenant>"
+     export APP_ID=$(echo $SPN | jq -r .appId)
+     export APP_SECRET=$(echo $SPN | jq -r .password)
+     export TENANT=$(echo $SPN | jq -r .tenant)
      ```
-   - Get `objectId` of `Microsoft Entra ID` application:
+   - Create a service principal (service account) for the Factory Assistant:
+     ```bash
+     SPN2=$(az ad sp create-for-rbac -n GenAI_Factory_Assistant)
+     ```
+      **Note(2)**: create 3 variables with: `appId`, `password` and `tenant`, from the output of the command, and **keep a note of them for future use**.
+     ```bash
+     export ASSISTANT_APP_ID=$(echo $SPN2 | jq -r .appId)
+     export ASSISTANT_APP_SECRET=$(echo $SPN2 | jq -r .password)
+     export ASSISTANT_TENANT=$(echo $SPN2 | jq -r .tenant)
+     ```
+   - Get `objectId` of `Microsoft Entra ID` application and create 1 variable:
      ```bash
      export OBJECT_ID=$(az ad sp show --id bc313c14-388c-4e7d-a58e-70017303ee3b --query id -o tsv)
      ```
@@ -57,9 +67,19 @@
      ```bash
      az eventhubs eventhub create --name $EVENTHUB_NAME --resource-group $RESOURCE_GROUP --namespace-name $EVENTHUB_NAMESPACE
      ```
+   - Retrieve the Event Hub Connection String and create 2 variables:
+     ```bash
+     EVENTHUB_INFO=$(az eventhubs namespace authorization-rule keys list --resource-group $RESOURCE_GROUP --namespace-name $EVENTHUB_NAMESPACE --name RootManageSharedAccessKey)
+     export EVENTHUB_KEYNAME=$(echo $EVENTHUB_INFO | jq -r .keyName)
+     export EVENTHUB_KEY=$(echo $EVENTHUB_INFO | jq -r .primaryKey)
+     ```
    - Create an Azure OpenAI resource:
      ```bash
-     az cognitiveservices account create --name $AZURE_OPENAI_NAME --resource-group $RESOURCE_GROUP --location $LOCATION --kind OpenAI --sku s0 --subscription $SUBSCRIPTION_ID
+     az cognitiveservices account create --name $AZURE_OPENAI_NAME --resource-group $RESOURCE_GROUP --location eastus --kind OpenAI --sku s0 --subscription $SUBSCRIPTION_ID
+     ```
+   - Retrieve the Azure OpenAI resource keys and create 1 variable:
+     ```bash
+     export AZURE_OPENAI_KEY=$(az cognitiveservices account keys list --name $AZURE_OPENAI_NAME --resource-group $RESOURCE_GROUP --query key1 -o tsv)
      ```
 #### Prepare and provision Edge platform
 
@@ -74,7 +94,7 @@
 - Option A (Virtual Machine in Azure)
    - If you want to use a Virtual Machine in Azure, you can deploy it using the Deploy button below:  
       [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fchriscrcodes%2Fsmart-factory%2Frefs%2Fheads%2Fmain%2Fartifacts%2Ftemplates%2Fvm%2Fazuredeploy.json)
-      - Review + create > Create
+      - `Review + create` > `Create`
 
       **Note**: `Standard_D4s_v3` is the recommended size for the Azure VM.
 
@@ -85,7 +105,7 @@
    - Install `curl` and `nano`:
      ```bash
      sudo apt update
-     sudo apt install curl nano -y
+     sudo apt install curl nano jq -y
      ```
 - Install K3s
    - Run the `K3s installation script`:
@@ -129,4 +149,4 @@
     ```bash
     az extension add --allow-preview true --name azure-iot-ops --version 0.5.1b1
     ```
-- You can now continue to [Part 2 - Connect your Edge platform to Cloud platform](./INSTALL-2.md)
+- **You can now continue to** > [Part 2 - Connect your Edge platform to Cloud platform](./INSTALL-2.md)
