@@ -18,7 +18,7 @@
      ```bash
      export CLUSTER_NAME="<YOUR_CLUSTER_NAME>"
      ```
-   - Connect to Azure (using the service principal created in [Part 1 - Provision resources (Edge and Cloud)](./INSTALL-1.md)
+   - Connect to Azure (using the service principal created in [Part 1 - Provision resources (Edge and Cloud)](./INSTALL-1.md))
      ```bash
      az login --service-principal -u $APP_ID -p $APP_SECRET --tenant $TENANT
      ```
@@ -35,7 +35,7 @@
      az connectedk8s enable-features -n $CLUSTER_NAME -g $RESOURCE_GROUP --custom-locations-oid $OBJECT_ID --features cluster-connect custom-locations
      ```
 
-#### Deploy and configure Azure IoT Operations
+#### Deploy and configure Azure IoT Operations (v0.5.1b1)
 
 - Check [Azure IoT Operations prerequisites](https://learn.microsoft.com/en-us/azure/iot-operations/deploy-iot-ops/howto-deploy-iot-operations?tabs=cli#prerequisites)
 
@@ -45,6 +45,17 @@
      az iot ops verify-host     
      ```
 
+      ![az-iot-ops-verify-host](./artifacts/media/az-iot-ops-verify-host.png "az-iot-ops-verify-host")
+
+- Validate Azure IoT Operations pre-deployment checks  
+    - Before the deployment, use `az iot ops check` to execute IoT Operations **pre-deployment checks**.  
+    **Don't look at the post deployment checks this time.**
+      ```bash
+      az iot ops check
+      ```
+
+      ![az-iot-ops-check-pre](./artifacts/media/az-iot-ops-check-pre.png "az-iot-ops-check-pre")
+
 - Deploy Azure IoT Operations
    - Deploy Azure IoT Operations:
      ```bash
@@ -52,13 +63,17 @@
      ```
 
 - Confirm Azure IoT Operations installation  
-    - After the deployment is complete, use `az iot ops check` to evaluate IoT Operations service deployment for health, configuration, and usability. The check command can help you find problems in your deployment and configuration.
+    - After the deployment is complete, use `az iot ops check` to evaluate IoT Operations service deployment for health, configuration, and usability. The check command can help you find problems in your deployment and configuration.  
+    **Confirm post deployment checks are green.**
       ```bash
       az iot ops check
       ```
 
+      ![az-iot-ops-check-post](./artifacts/media/az-iot-ops-check-post.png "az-iot-ops-check-post")
+
 - Azure IoT Operations Dashboard - Configure Data Pipelines
     - Go to the [Azure IoT Operations Dashboard](https://iotoperations.azure.com/)
+    - Click on 'Get Started', select your site or 'Unassigned instances' and select your instance
     - Go to 'Data pipelines' > 'Reference datasets' > 'Create reference dataset'
     - Create `2 reference datasets`
       1. Create a reference dataset:
@@ -68,6 +83,7 @@
             - Property Path: `.Shift`
             - Primary key: `Yes`
             - Create
+          ![aio-dp-op](./artifacts/media/dp-rd-operations.png "aio-dp-op")
       2. Create a reference dataset:
           - Name: `production-data`
           - Properties > Add property
@@ -75,7 +91,9 @@
             - Property Path: `.Cell`
             - Primary key: `Yes`
             - Create
-    - **Note**: the reference datasets will enable data enrichment at the Edge with datasets only available at Edge (Manufacturing Execution System (MES) Factory scenario).
+            ![aio-dp-prd](./artifacts/media/dp-rd-production.png "aio-dp-prd")
+    - **Note**: the reference datasets will enable data enrichment at the Edge with datasets only available at Edge (Manufacturing Execution System (MES) Factory scenario).  
+    ![aio-dp-rd](./artifacts/media/dp-rd.png "aio-dp-rd")
 
     - Create `4 data pipelines`      
       1. Go back on 'Data pipelines' > 'Create pipeline'
@@ -94,7 +112,8 @@
           - Click on `<pipeline name>`, choose a name 'aggregate-data-silver' and click 'Apply'
           - 'Import' > choose the file [aggregate-data-silver.json](./artifacts/templates/azure-iot-operations/data-processor/pipelines/aggregate-data-silver.json)
           - Click 'Save'
-    - **Note**: the data pipelines will enable data processing, with data coming from the Factory Simulator, entirely at Edge.
+    - **Note**: the data pipelines will enable data processing, with data coming from the Factory Simulator, entirely at Edge.  
+    ![aio-dp](./artifacts/media/dp-pipelines.png "aio-dp")
 
 #### Deploy Factory Simulator
 
@@ -126,7 +145,8 @@
     ```
   - Confirm if the 2 following topics are present:
     - `LightningCars` (data coming from the Factory Simulator)
-    - `Processed-Data` (data coming from Azure IoT Operations Data Processor component)
+    - `Processed-Data` (data coming from Azure IoT Operations Data Processor component)  
+    ![MQTT Broker Client](./artifacts/media/mqttui.png "MQTT Broker Client")
   - If the topics aren't shown, restart the Factory Simulator container:
     - Exit the MQTT client interface (type q)
     - Exit the MQTT client container (type exit and press Enter)
@@ -145,7 +165,7 @@
     ```bash
     curl -O https://raw.githubusercontent.com/chriscrcodes/smart-factory/main/artifacts/templates/k3s/pods/Cloud-connector/eventhub/Cloud-connector-eventhub.yaml
     ```
-  - Modify file with the name of the event hub name space created in [Step 1](#step-1---provision-azure-resources) (`<EVENTHUB_NAMESPACE>` variable):
+  - Modify file with the name of the event hub name space created in [Step 1](#step-1---provision-azure-resources) (`$EVENTHUB_NAMESPACE` variable):
     - ```bash
       nano Cloud-connector-eventhub.yaml
       ```
@@ -162,7 +182,7 @@
     ```bash
     curl -O https://raw.githubusercontent.com/chriscrcodes/smart-factory/main/artifacts/templates/k3s/pods/Cloud-connector/eventhub/mapping-mqttTopic-kafkaTopic.yaml
     ```
-  - Modify file with the name of the event hub name space created in [Step 1](#step-1---provision-azure-resources) (`<EVENTHUB_NAME>` variable):
+  - Modify file with the name of the event hub name space created in [Step 1](#step-1---provision-azure-resources) (`$EVENTHUB_NAME` variable):
     - ```bash
       nano mapping-mqttTopic-kafkaTopic.yaml
       ```
@@ -176,11 +196,14 @@
     - Access Control (IAM) > Add > Add role assignment
     - `Azure Event Hubs Data Sender` > Next
     - Assign access to `User, group, or service principal`
-    - Select Members > type 'mq' to locate the 'mq' extension used by Azure IoT Operations  
+    - Select Members > type `mq` to locate the `MQTT` extension used by Azure IoT Operations  
       (For example: `/subscriptions/xxx/resourceGroups/xxx/providers/Microsoft.Kubernetes/connectedClusters/xxx/providers/Microsoft.KubernetesConfiguration/extensions/mq-xxx`)
     - Repeat the same steps for the role `Azure Event Hubs Data Receiver`
 
   - Confirm data flowing from Edge to Cloud
     - Locate the Azure Event Hub name space you created in [Azure Portal](https://portal.azure.com/)
-    - Data Explorer (preview) > select the event hub you created in [Step 1](#step-1---provision-azure-resources) (`<EVENTHUB_NAME>` variable)
-    - Click on 'View events' > and select and event on the right to confirm data flow is operational
+    - Data Explorer (preview) > select the event hub you created in [Step 1](#step-1---provision-azure-resources) (`$EVENTHUB_NAME` variable)
+    - Click on 'View events' > and select and event on the right to confirm data flow is operational  
+    ![evh-messages](./artifacts/media/evh-messages.png "evh-messages")
+
+  - You can now continue to [Part 3 - Configure the solution (Cloud part)](./INSTALL-3.md)
