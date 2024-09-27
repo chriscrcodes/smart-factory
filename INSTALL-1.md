@@ -3,24 +3,6 @@
 #### Prepare and provision Cloud platform
    - From your computer, open up the [Azure Portal](https://portal.azure.com/)
    - Use the [Azure Cloud Shell (**Bash**)](https://learn.microsoft.com/en-us/azure/Cloud-shell/get-started/ephemeral?tabs=azurecli#start-Cloud-shell)
-   - Set Azure Subscription context:
-     ```bash
-     az account set -s $SUBSCRIPTION_ID
-     ```
-   - Create a service principal (service account) to manage Azure:
-     ```bash
-      az ad sp create-for-rbac -n AIO_SP_Contrib --role Contributor --scopes /subscriptions/$SUBSCRIPTION_ID
-     ```
-      **Checkpoint (1)**: create variables with: appId, password and tenant, from the output of the command, and **keep a note of them for future use**.
-     ```bash
-     export APP_ID="<appId>"
-     export APP_SECRET="<password>"
-     export TENANT="<tenant>"
-     ```
-   - Get `objectId` of Microsoft Entra ID application:
-     ```bash
-     export OBJECT_ID=$(az ad sp show --id bc313c14-388c-4e7d-a58e-70017303ee3b --query id -o tsv)
-     ```
    - Set Environment Variables for services to create in Azure:
      ```bash
      export SUBSCRIPTION_ID="<YOUR_SUBSCRIPTION_ID>"
@@ -31,7 +13,25 @@
      export EVENTHUB_NAME="<YOUR_EVENTHUB_NAME>"
      export AZURE_OPENAI_NAME="<YOUR_AZURE_OPENAI_NAME>"
      ```
-     **Checkpoint (2)**: **keep a note of the environment variables for future use**.
+     **Checkpoint (1)**: **keep a note of the environment variables for future use**.
+   - Set Azure Subscription context:
+     ```bash
+     az account set -s $SUBSCRIPTION_ID
+     ```
+   - Create a service principal (service account) to manage Azure:
+     ```bash
+      az ad sp create-for-rbac -n AIO_SP_Contrib --role Contributor --scopes /subscriptions/$SUBSCRIPTION_ID
+     ```
+      **Checkpoint (2)**: create variables with: `appId`, `password` and `tenant`, from the output of the command, and **keep a note of them for future use**.
+     ```bash
+     export APP_ID="<appId>"
+     export APP_SECRET="<password>"
+     export TENANT="<tenant>"
+     ```
+   - Get `objectId` of `Microsoft Entra ID` application:
+     ```bash
+     export OBJECT_ID=$(az ad sp show --id bc313c14-388c-4e7d-a58e-70017303ee3b --query id -o tsv)
+     ```
    - Register required Resource Providers (execute this step only once per subscription):
      ```bash
      az provider register -n "Microsoft.ExtendedLocation"
@@ -123,7 +123,7 @@
     ```
   - Install `Azure arc extension`:
     ```bash
-    az extension add --allow-preview true --name connectedk8s --version 1.9.0
+    az extension add --allow-preview true --name connectedk8s
     ```
   - Install `Azure IoT Operations extension` (v0.5.1b1, to be able to use the Data Processor component):
     ```bash

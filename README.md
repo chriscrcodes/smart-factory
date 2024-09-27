@@ -53,7 +53,7 @@ From `Bronze` (Edge/Simulator) ⇒ `Silver` (Edge/Azure IoT Operations Data Proc
 - **User Prompt**: user asks a question to the Factory Assistant.
 - **Custom Large Language Model (LLM) Factory Assistant**: analyze prompt and write the statement to query the Database in Fabric.
 - **Semantic Kernel**: execute query in background and return results (Python code).
-- **Web Application**: provide the graphical user interface (based on the open-source framework 'Streamlit').
+- **Web Application**: provide the graphical user interface (based on the open-source framework `Streamlit`).
 
 ## Prerequisites
 
@@ -68,10 +68,10 @@ From `Bronze` (Edge/Simulator) ⇒ `Silver` (Edge/Azure IoT Operations Data Proc
 
 ### Software requirements
 
- - [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/) the Azure command-line interface.
- - [K3s](https://k3s.io/) Lightweight Kubernetes. Easy to install, half the memory, all in a binary of less than 100 MB.
- - [curl](https://curl.se/) command line tool that developers use to transfer data to and from a server.
- - [nano](https://www.nano-editor.org/): text editor.
+ - [`Azure CLI`](https://learn.microsoft.com/en-us/cli/azure/) the Azure command-line interface.
+ - [`K3s`](https://k3s.io/) Lightweight Kubernetes. Easy to install, half the memory, all in a binary of less than 100 MB.
+ - [`curl`](https://curl.se/) command line tool that developers use to transfer data to and from a server.
+ - [`nano`](https://www.nano-editor.org/) text editor.
 
 ### Cloud services requirements
 
