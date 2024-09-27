@@ -82,7 +82,7 @@
             - Property name: `Shift`
             - Property Path: `.Shift`
             - Primary key: `Yes`
-            - Create
+            - Create  
           ![aio-dp-op](./artifacts/media/dp-rd-operations.png "aio-dp-op")
       2. Create a reference dataset:
           - Name: `production-data`
@@ -90,7 +90,7 @@
             - Property name: `Cell`
             - Property Path: `.Cell`
             - Primary key: `Yes`
-            - Create
+            - Create  
             ![aio-dp-prd](./artifacts/media/dp-rd-production.png "aio-dp-prd")
     - **Note**: the reference datasets will enable data enrichment at the Edge with datasets only available at Edge (Manufacturing Execution System (MES) Factory scenario).  
     ![aio-dp-rd](./artifacts/media/dp-rd.png "aio-dp-rd")
