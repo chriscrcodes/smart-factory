@@ -6,7 +6,7 @@
 🔍 Real-time ingestion and processing of operations data (OT): operators, manufactured products, and machine maintenance schedules.  
 🗣️ Data processing: Edge and Cloud, with a Semantic Kernel to power the Factory Assistant, for smarter interactions.  
 
-[Video on the IoT Show](https://youtu.be/-AxWwJU_G_U?feature=shared), Demo starts at [19:54](https://youtu.be/-AxWwJU_G_U?feature=shared&t=1194)
+[Video on the IoT Show](https://youtu.be/-AxWwJU_G_U?feature=shared) (demo starts at [19:54](https://youtu.be/-AxWwJU_G_U?feature=shared&t=1194)).
 
 ### Key features and benefits
 
@@ -51,7 +51,7 @@ From `Bronze` (Edge/Simulator) ⇒ `Silver` (Edge/Azure IoT Operations Data Proc
 ![Factory Assistant Communication Flow](./artifacts/media/factory-assistant-communication-flow.png "Factory Assistant Communication Flow")
 
 - **User Prompt**: user asks a question to the Factory Assistant.
-- **Custom Large Language Model (LLM) Factory Assistant**: analyze prompt and write the statement to query the Database in Fabric.
+- **Custom Large Language Model (LLM) Factory Assistant**: analyze prompt and write the statement to query the Database in Fabric. **No data from the database is transmitted to the Large Language Model**.
 - **Semantic Kernel**: execute query in background and return results (Python code).
 - **Web Application**: provide the graphical user interface (based on the open-source framework `Streamlit`).
 
@@ -68,11 +68,12 @@ From `Bronze` (Edge/Simulator) ⇒ `Silver` (Edge/Azure IoT Operations Data Proc
 
 ### Software requirements
 
- - [`Azure CLI`](https://learn.microsoft.com/en-us/cli/azure/) the Azure command-line interface.
  - [`K3s`](https://k3s.io/) Lightweight Kubernetes. Easy to install, half the memory, all in a binary of less than 100 MB.
+ - [`python >=v3.10`](https://www.python.org/) Programming Language
  - [`curl`](https://curl.se/) command line tool that developers use to transfer data to and from a server.
  - [`nano`](https://www.nano-editor.org/) text editor.
  - [`jq`](https://github.com/jqlang/jq) command-line JSON processor.
+ - [`Azure CLI`](https://learn.microsoft.com/en-us/cli/azure/) the Azure command-line interface.
 
 ### Cloud services requirements
 
@@ -92,5 +93,5 @@ From `Bronze` (Edge/Simulator) ⇒ `Silver` (Edge/Azure IoT Operations Data Proc
 4. [Deploy and use the Generative AI Factory Assistant](./INSTALL-4.md)
 
 ## Demo
-
+![Factory Assistant Prompt](./artifacts/media/factory-assistant-prompt.png "Factory Assistant Prompt")
 ![Factory Assistant User Interface](./artifacts/media/factory-assistant-ui.png "Factory Assistant User Interface")

@@ -3,5 +3,5 @@
   "question2": "Could you give me a list of operators, the sites they are associated with, and their current shifts?",
   "question3": "If I need to contact Operator Tom at the Austin Site, what is his phone number and email address?",
   "question4": "I would like to get the list of Cells, Sites, Areas, and their Maintenance Status and Maintenance Date.",
-  "question5": "I want to calculate the yield for each site today, based on the total units produced and the good units produced. Please sort the results by yield percentage and product name."
+  "question5": "I want to calculate the yield for each site this month, based on the total units produced and the good units produced. Display good units, total units and sort the results by yield percentage and site."
 }

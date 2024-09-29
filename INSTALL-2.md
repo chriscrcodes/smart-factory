@@ -162,11 +162,11 @@
 
   - Download the pod deployment file (Cloud connector)
     ```bash
-    curl -O https://raw.githubusercontent.com/chriscrcodes/smart-factory/main/artifacts/templates/k3s/pods/Cloud-connector/eventhub/Cloud-connector-eventhub.yaml
+    curl -O https://raw.githubusercontent.com/chriscrcodes/smart-factory/main/artifacts/templates/k3s/pods/cloud-connector/eventhub/cloud-connector-eventhub.yaml
     ```
   - Modify file with the name of the event hub name space created in [Step 1](#step-1---provision-azure-resources) (`$EVENTHUB_NAMESPACE` variable):
     - ```bash
-      nano Cloud-connector-eventhub.yaml
+      nano cloud-connector-eventhub.yaml
       ```
     - Line 14: 
       ```bash
@@ -179,7 +179,7 @@
 
   - Download the pod deployment file (mapping)
     ```bash
-    curl -O https://raw.githubusercontent.com/chriscrcodes/smart-factory/main/artifacts/templates/k3s/pods/Cloud-connector/eventhub/mapping-mqttTopic-kafkaTopic.yaml
+    curl -O https://raw.githubusercontent.com/chriscrcodes/smart-factory/main/artifacts/templates/k3s/pods/cloud-connector/eventhub/mapping-mqttTopic-kafkaTopic.yaml
     ```
   - Modify file with the name of the event hub name space created in [Step 1](#step-1---provision-azure-resources) (`$EVENTHUB_NAME` variable):
     - ```bash
@@ -205,4 +205,4 @@
     - Click on `View events` > and select an event on the right to confirm data flow is operational  
     ![evh-messages](./artifacts/media/evh-messages.png "evh-messages")
 
-  - **You can now continue to** > [Part 3 - Configure the solution (Cloud part)](./INSTALL-3.md)
+  - ✅ **You can now continue to** > [Part 3 - Configure the solution (Cloud part)](./INSTALL-3.md)
