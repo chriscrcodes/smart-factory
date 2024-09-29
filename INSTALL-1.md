@@ -2,7 +2,7 @@
 
 #### Prepare and provision Cloud platform
    - From your computer, open up the [Azure Portal](https://portal.azure.com/)
-   - Use the [Azure Cloud Shell (**Bash**)](https://learn.microsoft.com/en-us/azure/Cloud-shell/get-started/ephemeral?tabs=azurecli#start-Cloud-shell)
+   - Use the [Azure Cloud Shell (**Bash**)](https://learn.microsoft.com/en-us/azure/cloud-shell/get-started/ephemeral?tabs=azurecli#start-cloud-shell)
    - Set Environment Variables for services to create in Azure:
      ```bash
      export SUBSCRIPTION_ID="<YOUR_SUBSCRIPTION_ID>"
@@ -69,9 +69,10 @@
      ```
    - Retrieve the Event Hub Connection String and create 2 variables:
      ```bash
-     EVENTHUB_INFO=$(az eventhubs namespace authorization-rule keys list --resource-group $RESOURCE_GROUP --namespace-name $EVENTHUB_NAMESPACE --name RootManageSharedAccessKey)
-     export EVENTHUB_KEYNAME=$(echo $EVENTHUB_INFO | jq -r .keyName)
-     export EVENTHUB_KEY=$(echo $EVENTHUB_INFO | jq -r .primaryKey)
+     EVENTHUB_KEY_CREATE=$(az eventhubs namespace authorization-rule create --resource-group $RESOURCE_GROUP --namespace-name $EVENTHUB_NAMESPACE --name Listen --rights Listen)
+     EVENTHUB_KEY_INFO=$(az eventhubs namespace authorization-rule keys list --resource-group $RESOURCE_GROUP --namespace-name $EVENTHUB_NAMESPACE --name Listen)
+     export EVENTHUB_KEYNAME=$(echo $EVENTHUB_KEY_INFO | jq -r .keyName)
+     export EVENTHUB_KEY=$(echo $EVENTHUB_KEY_INFO | jq -r .primaryKey)
      ```
    - Create an Azure OpenAI resource:
      ```bash
@@ -149,4 +150,4 @@
     ```bash
     az extension add --allow-preview true --name azure-iot-ops --version 0.5.1b1
     ```
-- **You can now continue to** > [Part 2 - Connect your Edge platform to Cloud platform](./INSTALL-2.md)
+- ✅ **You can now continue to** > [Part 2 - Connect your Edge platform to Cloud platform](./INSTALL-2.md)
