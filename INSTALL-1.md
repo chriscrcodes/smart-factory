@@ -150,4 +150,24 @@
     ```bash
     az extension add --allow-preview true --name azure-iot-ops --version 0.5.1b1
     ```
+
+- Prepare your Cluster for Azure IoT Operations
+   - Check [Azure IoT Operations prerequisites](https://learn.microsoft.com/en-us/azure/iot-operations/deploy-iot-ops/howto-deploy-iot-operations?tabs=cli#prerequisites)
+
+   - Validate Cluster readiness for Azure IoT Operations:
+     ```bash
+     az iot ops verify-host     
+     ```
+
+      ![az-iot-ops-verify-host](./artifacts/media/az-iot-ops-verify-host.png "az-iot-ops-verify-host")
+
+- Validate Azure IoT Operations pre-deployment checks  
+    - Before the deployment, use `az iot ops check` to execute IoT Operations pre-deployment checks.  
+    **Don't look at the post deployment checks this time.**
+      ```bash
+      az iot ops check
+      ```
+
+      ![az-iot-ops-check-pre](./artifacts/media/az-iot-ops-check-pre.png "az-iot-ops-check-pre")
+      
 - ✅ **You can now continue to** > [Part 2 - Connect your Edge platform to Cloud platform](./INSTALL-2.md)

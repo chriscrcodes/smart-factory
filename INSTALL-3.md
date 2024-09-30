@@ -105,34 +105,54 @@
     ```
 - Click `Run`
 
-#### Create the event stream to ingest data from event hub to a database
-- Click on `Workspaces` > `My workspace`
-- `New` > `Eventstream` > choose a name and click `Create`
-- Click on `New source` > `Azure Event Hubs`
-- Choose a `Source name`
-- `Cloud connection` > `Create new`
-- Retrieve variables created in [Part 1 - Provision resources (Edge and Cloud)](./INSTALL-1.md) ==> **Note(1)**
-- `Event Hub namespace` > `$EVENTHUB_NAMESPACE` variable
-- `Event Hub` > `$EVENTHUB_NAME` variable
-- `Shared Access Key Name` > `$EVENTHUB_KEYNAME` variable
-- `Shared Access Key` > `$EVENTHUB_KEY` variable
-- Click `Create`
-- Check if the event hub is select in `Cloud connection`
-- `Consumer group` > `Create new` > type `Fabric` and click `Done`
-- `Data format` > select `Json`
-- Tick the box `Activate streaming after adding data source` and click `Add`
-- Click on `New destination` > `KQL Database`
-- Select `Direct ingestion`
-- Choose a `Destination name`
-- `Workspace` > select `My workspace`
-- `KQL Database` > select your database and click `Add and configure`
-- A new wizard will open > select the table `aio_silver`, click `Next`, `Finish` and `Close`
+#### Create the event stream to ingest data from Azure Event Hub to a database in Microsoft Fabric
+1. Configure event stream source
+    - Click on `Workspaces` > `My workspace`
+    - `New` > `Eventstream` > choose the name `aio_silver` and click `Create`
+    - Click on `New source` > `Azure Event Hubs`
+    - Choose a `Source name`
+    - `Cloud connection` > `Create new`
+    - Retrieve variables created in [Part 1 - Provision resources (Edge and Cloud)](./INSTALL-1.md) ==> **Note(1)**
+    - `Event Hub namespace` > `$EVENTHUB_NAMESPACE` variable
+    - `Event Hub` > `$EVENTHUB_NAME` variable
+    - `Shared Access Key Name` > `$EVENTHUB_KEYNAME` variable
+    - `Shared Access Key` > `$EVENTHUB_KEY` variable
+    - Click `Create`
+    - Check if the event hub is select in `Cloud connection`
+    - `Consumer group` > `Create new` > type `Fabric` and click `Done`
+    - `Data format` > select `Json`
+    - Tick the box `Activate streaming after adding data source` and click `Add`
+
+2. Configure event stream destination
+    - Click on `New destination` > `KQL Database`
+    - Select `Event processing before ingestion`
+    - Choose a `Destination name`
+    - `Workspace` > select `My workspace`
+    - `KQL Database` > select your database
+    - `Destination table` > select `aio_silver`
+    - `Input data format` > `Json`
+    - Tick the box `Activate streaming after adding data source` and click `Add`
+
+3. Configure fields mapping
+    - Click `Open event processor`
+    - A new wizard will open
+    - Select `aio_silver` > `+ (plus sign)` > `Manage fields`
+    - `Operation name` > keep `Managefields1`
+    - Click `Add all fields`
+    - Go to the end of the list of fields and remove the 3 following fields:
+        - `EventProcessedUtcTime`
+        - `PartitionId`
+        - `EventEnqueuedUtcTime`
+        - (`...` and `Remove`)
+        ![fabric-eventstream-2](./artifacts/media/fabric6.png "fabric-eventstream-2")
+        - Click `Done` twice
+    - Click `Add`
+
+        ![fabric-eventstream](./artifacts/media/fabric7.png "fabric-eventstream")
 
 #### Confirm that the Data stream is connected
 - Click on `Workspaces` > `My workspace`
 - Select the database created (type: `KQL Database`)
 - Click on `Data stream` and confirm the Status is `Connected`
-
-![fabric-eventstream](./artifacts/media/fabric6.png "fabric-eventstream")
 
 - ✅ **You can now continue to** > [Part 4 - Deploy and use the Generative AI Factory Assistant](./INSTALL-4.md)
