@@ -19,11 +19,11 @@
      ```
    - Connect to Azure (using the service principal created in [Part 1 - Provision resources (Edge and Cloud)](./INSTALL-1.md))
      ```bash
-     az login --service-principal -u $APP_ID -p $APP_SECRET --tenant $TENANT
+     az login --service-principal --username $APP_ID --password $APP_SECRET --tenant $TENANT
      ```
    - Set Azure Subscription context:
      ```bash
-     az account set -s $SUBSCRIPTION_ID
+     az account set --subscription $SUBSCRIPTION_ID
      ```
    - Connect Kubernetes Cluster to Azure:
      ```bash
