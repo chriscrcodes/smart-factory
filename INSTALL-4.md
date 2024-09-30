@@ -47,12 +47,20 @@
     ```
 
 #### Start the Factory Assistant Application
-- Start a terminal from the [directory](./artifacts/factory-assistant/)
-- Execute the following commands:
-    ```bash
-    pip install -r requirements.txt
-    streamlit run .\frontend.py
-    ```
+- Option 1 (from command line)
+    - Start a terminal from the [directory](./artifacts/factory-assistant/)
+    - Execute the following commands:
+        ```bash
+        pip install -r requirements.txt
+        streamlit run .\frontend.py
+        ```
+- Option 2 (Docker)
+    - Start a terminal from the [directory](./artifacts/factory-assistant/)
+    - Execute the following commands:
+        ```bash
+        docker build . -t factory-assistant:v1.0
+        docker run -p 8501:8501 factory-assistant:v1.0
+        ```
 - Launch a browser with the following URL to access the application:
     ```
     http://localhost:8501/
