@@ -32,17 +32,17 @@
 - `Connections` > copy the name of your Fabric endpoint (Connection type: `Azure Data Explorer (Kusto)`)
 - Modify environment variables in `.env` file
     ```bash
-    AZURE_OPENAI_ENDPOINT           = < YOUR OPEN AI ENDPOINT IN AZURE > # for example: https://aoai123456.openai.azure.com
-    AZURE_OPENAI_API_KEY            = < VALUE OF $AZURE_OPENAI_KEY VARIABLE >
+    AZURE_OPENAI_ENDPOINT           = <YOUR_AZURE_OPENAI_ENDPOINT> # for example: https://aoai123456.openai.azure.com
+    AZURE_OPENAI_API_KEY            = <$AZURE_OPENAI_KEY>
     AZURE_OPENAI_DEPLOYMENT_NAME    = "smart-factory"
     AZURE_OPENAI_MODEL_NAME         = "gpt-4o"
     AZURE_OPENAI_DEPLOYMENT_VERSION = "2024-08-06"
 
-    AZURE_AD_TENANT_ID              = < VALUE OF $ASSISTANT_TENANT VARIABLE >
-    KUSTO_CLUSTER                   = < YOUR FABRIC ENDPOINT >
-    KUSTO_MANAGED_IDENTITY_APP_ID   = < VALUE OF $ASSISTANT_APP_ID VARIABLE >
-    KUSTO_MANAGED_IDENTITY_SECRET   = < VALUE OF $ASSISTANT_APP_SECRET VARIABLE >
-    KUSTO_DATABASE_NAME             = < YOUR_DATABASE >
+    AZURE_AD_TENANT_ID              = <$ASSISTANT_TENANT>
+    KUSTO_CLUSTER                   = <YOUR_MICROSOFT_FABRIC_ENDPOINT>
+    KUSTO_MANAGED_IDENTITY_APP_ID   = <$ASSISTANT_APP_ID>
+    KUSTO_MANAGED_IDENTITY_SECRET   = <$ASSISTANT_APP_SECRET>
+    KUSTO_DATABASE_NAME             = <YOUR_DATABASE>
     KUSTO_TABLE_NAME                = "aio_gold"
     ```
 
