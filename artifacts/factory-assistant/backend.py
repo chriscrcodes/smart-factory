@@ -4,7 +4,7 @@ from datetime import datetime
 from azure.kusto.data import KustoConnectionStringBuilder
 from azure.kusto.data.aio import KustoClient
 from azure.kusto.data.helpers import dataframe_from_result_table
-import semantic_kernel as sk
+from semantic_kernel import Kernel
 from semantic_kernel.connectors.ai.open_ai import AzureChatCompletion
 from semantic_kernel.functions import KernelArguments
 
@@ -26,27 +26,25 @@ async def KustoConnect(database, query):
 
 # Instantiate Semantic Kernel
 def SKernel():
-    kernel = sk.Kernel()
-    kernel.add_service(
-        AzureChatCompletion(
-            service_id="AzureOpenAI",
-            deployment_name=os.getenv('AZURE_OPENAI_DEPLOYMENT_NAME'),
-            endpoint=os.getenv('AZURE_OPENAI_ENDPOINT'),
-            api_key=os.getenv('AZURE_OPENAI_API_KEY')
-        )
+    kernel = Kernel()
+    chat_completion = AzureChatCompletion(
+        deployment_name = os.getenv('AZURE_OPENAI_DEPLOYMENT_NAME'),
+        api_key = os.getenv('AZURE_OPENAI_API_KEY'),
+        endpoint = os.getenv('AZURE_OPENAI_ENDPOINT')
     )
+    kernel.add_service(chat_completion)
     plugin = kernel.add_plugin(
-        parent_directory=os.path.join(__file__, os.getenv('PLUGINS_RELATIVE_PATH')),
-        plugin_name=os.getenv('PLUGINS_DIRECTORY')
+        parent_directory = os.path.join(__file__, "../Plugins/"),
+        plugin_name = "DataAnalysis"
     )
     return kernel, plugin
 
 # Load Custom Plugin for Kusto Query Language
 async def AgentKusto(kernel, plugin, prompt, database, table, schema):
     arguments = KernelArguments(
-        request=prompt,
-        table=table,
-        schema=schema
+        request = prompt,
+        table = table,
+        schema = schema
     )
     SKInvoke = await kernel.invoke(plugin["KustoQL"], arguments)
     cleaned_output = str(SKInvoke).replace("kusto", "").replace("```kql", "").replace("```", "")
