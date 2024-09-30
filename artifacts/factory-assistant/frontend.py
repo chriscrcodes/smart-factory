@@ -35,23 +35,23 @@ with open('./frontend_config.yml', 'r') as file:
 title = config['streamlit']['title']
 
 # Load sample questions
-with open('sample_questions.json', 'r', encoding="utf-8") as file:
+with open('sample_questions.json', 'r', encoding = "utf-8") as file:
     example_questions = json.load(file)
 question_list = [q for q in example_questions.values()]
 
 # Set page config
 st.set_page_config(
-    page_title=config['streamlit']['tab_title']
+    page_title = config['streamlit']['tab_title']
 )
 
 left_co, cent_co,last_co = st.columns(3)
 with cent_co:
-    st.image(config['streamlit']['logo'], width=400)
+    st.image(config['streamlit']['logo'], width = 400)
 st.title(config['streamlit']['title'])
 
 # Set sidebar
 st.sidebar.info(config['streamlit']['about'])
-reset = st.sidebar.button("Reset Chat", on_click=clear_input)
+reset = st.sidebar.button("Reset Chat", on_click = clear_input)
 
 # Initialize session state
 if "question" not in st.session_state:
@@ -60,7 +60,7 @@ if "messages" not in st.session_state:
     st.session_state.messages = [{"role": "assistant", "content": config['streamlit']['assistant_intro_message']}]
 
 # Example questions select box
-question = st.selectbox("Example Questions:", [""] + question_list, key="selected_question")
+question = st.selectbox("Example Questions:", [""] + question_list, key = "selected_question")
 
 # Check for duplicates
 if question and not any(isinstance(msg["content"], str) and msg["content"] == question for msg in st.session_state.messages):
