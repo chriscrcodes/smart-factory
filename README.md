@@ -50,10 +50,31 @@ From `Bronze` (Edge/Simulator) ⇒ `Silver` (Edge/Azure IoT Operations Data Proc
 
 ![Factory Assistant Communication Flow](./artifacts/media/factory-assistant-communication-flow.png "Factory Assistant Communication Flow")
 
-- **User Prompt**: user asks a question to the Factory Assistant.
-- **Custom Large Language Model (LLM) Factory Assistant**: analyze prompt and write the statement to query the Database in Fabric. **No data from the database is transmitted to the Large Language Model**.
-- **Semantic Kernel**: execute query in background and return results (Python code).
-- **Web Application**: provide the graphical user interface (based on the open-source framework `Streamlit`).
+1. **User Prompt**: user asks a question to the Factory Assistant.  
+    The graphical user interface is based on the open-source framework `Streamlit`.
+2. **Custom Large Language Model (LLM)**: analyzes the prompt and generate the corresponding query to be executed to the database in Microsoft Fabric.  
+3. **Semantic Kernel**: execute query and return results (Python application).
+
+#### Creating complex queries from natural language prompt - Example
+![Factory Assistant Prompt](./artifacts/media/factory-assistant-prompt.png "Factory Assistant Prompt")
+
+1. **Prompt**: _"I want to calculate the yield for each site this month, based on the total units produced and the good units produced. Display good units, total units and sort the results by yield percentage and site."_
+2. **Generative AI Model**: analyzes the prompt and generate the corresponding query to be executed to the database.  
+**No data from the database is transmitted to the Large Language Model, only the prompt and the schema of the database.**  
+    Example query generated in `KQL (Kusto Query Language)`:  
+    ```
+    gold
+    | where startofmonth(Timestamp) == startofmonth(now())
+    | summarize TotalUnitsProduced = sum(UnitsProduced), TotalGoodUnitsProduced = sum(GoodUnitsProduced) by Site
+    | extend YieldPercentage = (TotalGoodUnitsProduced * 100.0) / TotalUnitsProduced
+    | project Site, TotalGoodUnitsProduced, TotalUnitsProduced, YieldPercentage
+    | order by YieldPercentage desc, Site asc
+    | take 100
+    | distinct Site, TotalGoodUnitsProduced, TotalUnitsProduced, YieldPercentage
+    ```  
+
+3. **`Backend application (Python)`**: queries the database to retrieve results.  
+    **`Frontend application (Streamlit)`**: provides the user interface.
 
 ## Prerequisites
 
@@ -85,13 +106,13 @@ From `Bronze` (Edge/Simulator) ⇒ `Silver` (Edge/Azure IoT Operations Data Proc
     - _Optional_: Virtual Machine (if you want to test everything in Azure Cloud)
  - Microsoft Fabric Tenant (you can try it for free [here](https://www.microsoft.com/en-us/microsoft-fabric/getting-started?msockid=27cd43526f4e6b2a1fa857d06e486a3c))
 
+## Demo
+
+![Factory Assistant User Interface](./artifacts/media/factory-assistant-ui.png "Factory Assistant User Interface")
+
 ## Solution build steps
 
-1. [Provision resources (Edge and Cloud)](./INSTALL-1.md)
-2. [Connect your Edge platform to Cloud platform](./INSTALL-2.md)
-3. [Configure the solution (Cloud part)](./INSTALL-3.md)
-4. [Deploy and use the Generative AI Factory Assistant](./INSTALL-4.md)
-
-## Demo
-![Factory Assistant Prompt](./artifacts/media/factory-assistant-prompt.png "Factory Assistant Prompt")
-![Factory Assistant User Interface](./artifacts/media/factory-assistant-ui.png "Factory Assistant User Interface")
+### 1. [Provision resources (Edge and Cloud)](./INSTALL-1.md)
+### 2. [Connect your Edge platform to Cloud platform](./INSTALL-2.md)
+### 3. [Configure the solution (Cloud part)](./INSTALL-3.md)
+### 4. [Deploy and use the Generative AI Factory Assistant](./INSTALL-4.md)

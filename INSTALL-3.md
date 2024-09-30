@@ -62,8 +62,8 @@
     ```
     .create function with(folder = 'UpdatePolicyFunctions') EnrichWithReferenceData() {
         ["aio_silver"]
-        | join kind=fullouter ['maintenance'] on Cell
-        | join kind=fullouter ['directory'] on Operator
+        | join kind=innerunique ['maintenance'] on Cell
+        | join kind=innerunique ['directory'] on Operator
         | project Timestamp, Enterprise, Site, Area, Line, Cell, SerialNumber, MaintenanceStatus, MaintenanceDate, Operator, OperatorPhone, OperatorEmail, Shift, Product, LastCycleTime, TotalOperatingTime, PlannedProductionTime, UnitsProduced, GoodUnitsProduced, Energy, Temperature, Humidity, Pressure, Vibration, Speed
     }
     ```
