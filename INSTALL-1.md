@@ -1,7 +1,7 @@
 ### Part 1 - Provision resources (Edge and Cloud)
 
 #### Prepare and provision Cloud platform
-   - From your computer, open up the [Azure Portal](https://portal.azure.com/)
+   - Open a browser and navigate to the [Azure Portal](https://portal.azure.com/)
    - Use the [Azure Cloud Shell (**Bash**)](https://learn.microsoft.com/en-us/azure/cloud-shell/get-started/ephemeral?tabs=azurecli#start-cloud-shell)
    - Set Environment Variables for services to create in Azure:
      ```bash
