@@ -95,13 +95,6 @@
     ```
 - Click `Run`
 
-#### Enable streaming ingestion
-- Clear the text in the query set and replace by the following query:
-    ```
-    .alter table aio_silver policy streamingingestion enable
-    ```
-- Click `Run`
-
 #### Authorize the Factory Assistant to query the database
    - Retrieve the environment following variables you defined in [Part 1 - Provision resources (Edge and Cloud)](./INSTALL-1.md) ==> **Note(2)**:
      ```bash
