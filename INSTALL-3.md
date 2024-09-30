@@ -80,14 +80,24 @@
 - You should now see 4 tables:  
 ![fabric-tables](./artifacts/media/fabric5.png "fabric-tables")
 
-#### Activate the update policy
-- Clear the text in the query set and replace by the following queries:
+#### Disable streaming ingestion
+- Clear the text in the query set and replace by the following query:
     ```
     .alter table aio_silver policy streamingingestion disable
+    ```
+- Click `Run`
 
+#### Activate the update policy
+- Clear the text in the query set and replace by the following query:
+    ```
     .alter table aio_gold policy update 
     @'[{ "IsEnabled": true, "Source": "aio_silver", "Query": "EnrichWithReferenceData()", "IsTransactional": false, "PropagateIngestionProperties": false}]'
+    ```
+- Click `Run`
 
+#### Enable streaming ingestion
+- Clear the text in the query set and replace by the following query:
+    ```
     .alter table aio_silver policy streamingingestion enable
     ```
 - Click `Run`
@@ -101,6 +111,17 @@
 - Clear the text in the query set and replace by the following query:
     ```
     .add database <YOUR_DATABASE> viewers ('aadapp=<ASSISTANT_APP_ID>;<ASSISTANT_TENANT>') "Gen AI Factory Assistant"
+    ```
+- Click `Run`
+
+#### Authorize the Factory Assistant to query the table
+   - Retrieve the environment following variables you defined in [Part 1 - Provision resources (Edge and Cloud)](./INSTALL-1.md) ==> **Note(2)**:
+     ```bash
+     $ASSISTANT_APP_ID
+     $ASSISTANT_TENANT
+     ```
+- Clear the text in the query set and replace by the following query:
+    ```
     .add table aio_gold admins ('aadapp=<ASSISTANT_APP_ID>;<ASSISTANT_TENANT>') "Gen AI Factory Assistant"
     ```
 - Click `Run`

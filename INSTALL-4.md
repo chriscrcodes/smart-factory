@@ -67,6 +67,6 @@
     ```
 - You can now query the database using Natural Language  
 **Note**: **no data from the database is transmitted to the Large Language Model** in Azure Open AI, but only the prompt, and the model will return the appropriate query to execute.  
-- Some example queries are provided as examples.
+- Some example queries are provided.
 
     ![Factory Assistant User Interface](./artifacts/media/factory-assistant-ui.png "Factory Assistant User Interface")

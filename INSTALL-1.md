@@ -16,11 +16,11 @@
      **Note(1)**: **keep a note of the environment variables for future use**.
    - Set Azure Subscription context:
      ```bash
-     az account set -s $SUBSCRIPTION_ID
+     az account set --subscription $SUBSCRIPTION_ID
      ```
    - Create a service principal (service account) to manage Azure:
      ```bash
-     SPN=$(az ad sp create-for-rbac -n AIO_SP_Contrib --role Contributor --scopes /subscriptions/$SUBSCRIPTION_ID)
+     SPN=$(az ad sp create-for-rbac --name AIO_SP_Contrib --role Contributor --scopes /subscriptions/$SUBSCRIPTION_ID)
      ```
       **Note(2)**: create 3 variables with: `appId`, `password` and `tenant`, from the output of the command, and **keep a note of them for future use**.
      ```bash
@@ -30,7 +30,7 @@
      ```
    - Create a service principal (service account) for the Factory Assistant:
      ```bash
-     SPN2=$(az ad sp create-for-rbac -n GenAI_Factory_Assistant)
+     SPN2=$(az ad sp create-for-rbac --name GenAI_Factory_Assistant)
      ```
       **Note(2)**: create 3 variables with: `appId`, `password` and `tenant`, from the output of the command, and **keep a note of them for future use**.
      ```bash
@@ -40,16 +40,16 @@
      ```
    - Get `objectId` of `Microsoft Entra ID` application and create 1 variable:
      ```bash
-     export OBJECT_ID=$(az ad sp show --id bc313c14-388c-4e7d-a58e-70017303ee3b --query id -o tsv)
+     export OBJECT_ID=$(az ad sp show --id bc313c14-388c-4e7d-a58e-70017303ee3b --query id --output tsv)
      ```
    - Register required Resource Providers (execute this step only once per subscription):
      ```bash
-     az provider register -n "Microsoft.ExtendedLocation"
-     az provider register -n "Microsoft.Kubernetes"
-     az provider register -n "Microsoft.KubernetesConfiguration"
-     az provider register -n "Microsoft.IoTOperationsOrchestrator"
-     az provider register -n "Microsoft.IoTOperations"
-     az provider register -n "Microsoft.DeviceRegistry"
+     az provider register --namespace "Microsoft.ExtendedLocation"
+     az provider register --namespace "Microsoft.Kubernetes"
+     az provider register --namespace "Microsoft.KubernetesConfiguration"
+     az provider register --namespace "Microsoft.IoTOperationsOrchestrator"
+     az provider register --namespace "Microsoft.IoTOperations"
+     az provider register --namespace "Microsoft.DeviceRegistry"
      ```
    - Create a Resource Group:
      ```bash
@@ -80,7 +80,7 @@
      ```
    - Retrieve the Azure OpenAI resource keys and create 1 variable:
      ```bash
-     export AZURE_OPENAI_KEY=$(az cognitiveservices account keys list --name $AZURE_OPENAI_NAME --resource-group $RESOURCE_GROUP --query key1 -o tsv)
+     export AZURE_OPENAI_KEY=$(az cognitiveservices account keys list --name $AZURE_OPENAI_NAME --resource-group $RESOURCE_GROUP --query key1 --output tsv)
      ```
 #### Prepare and provision Edge platform
 
