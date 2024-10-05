@@ -8,7 +8,9 @@
      export SUBSCRIPTION_ID="<YOUR_SUBSCRIPTION_ID>"
      export LOCATION="<YOUR_REGION>"
      export RESOURCE_GROUP="<YOUR_RESOURCE_GROUP>"
-     export KEYVAULT_NAME="<YOUR_KEYVAULT_NAME>"
+     export STORAGE_ACCOUNT_NAME="<YOUR_STORAGE_ACCOUNT_NAME>"
+     export SCHEMA_REGISTRY_NAME="<YOUR_SCHEMA_REGISTRY_NAME>"
+     export SCHEMA_REGISTRY_NAMESPACE="<YOUR_SCHEMA_REGISTRY_NAMESPACE>"
      export EVENTHUB_NAMESPACE="<YOUR_EVENTHUB_NAMESPACE>"
      export EVENTHUB_NAME="<YOUR_EVENTHUB_NAME>"
      export AZURE_OPENAI_NAME="<YOUR_AZURE_OPENAI_NAME>"
@@ -28,6 +30,10 @@
      export APP_SECRET=$(echo $SPN | jq -r .password)
      export TENANT=$(echo $SPN | jq -r .tenant)
      ```
+   - Assign role to the service principal `SPN`
+      ```bash
+      az role assignment create --assignee $APP_ID --role "Role Based Access Control Administrator" --scope subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP
+      ```
    - Create a service principal (service account) for the Factory Assistant:
      ```bash
      SPN2=$(az ad sp create-for-rbac --name GenAI_Factory_Assistant)
@@ -44,20 +50,23 @@
      ```
    - Register required Resource Providers (execute this step only once per subscription):
      ```bash
-     az provider register --namespace "Microsoft.ExtendedLocation"
-     az provider register --namespace "Microsoft.Kubernetes"
-     az provider register --namespace "Microsoft.KubernetesConfiguration"
-     az provider register --namespace "Microsoft.IoTOperationsOrchestrator"
-     az provider register --namespace "Microsoft.IoTOperations"
-     az provider register --namespace "Microsoft.DeviceRegistry"
+      az provider register -n "Microsoft.ExtendedLocation"
+      az provider register -n "Microsoft.Kubernetes"
+      az provider register -n "Microsoft.KubernetesConfiguration"
+      az provider register -n "Microsoft.IoTOperations"
+      az provider register -n "Microsoft.DeviceRegistry"
      ```
    - Create a Resource Group:
      ```bash
      az group create --location $LOCATION --resource-group $RESOURCE_GROUP --subscription $SUBSCRIPTION_ID
      ```
-   - Create an Azure Key Vault:
+   - Create a storage account with `hierarchical namespace enabled`:
      ```bash
-     az keyvault create --enable-rbac-authorization false --name $KEYVAULT_NAME --resource-group $RESOURCE_GROUP
+     az storage account create --name $STORAGE_ACCOUNT_NAME --resource-group $RESOURCE_GROUP --enable-hierarchical-namespace
+     ```
+   - Create a schema registry that connects to your storage account:
+     ```bash
+     az iot ops schema registry create --name $SCHEMA_REGISTRY_NAME --resource-group $RESOURCE_GROUP --registry-namespace $SCHEMA_REGISTRY_NAMESPACE --sa-resource-id $(az storage account show --name $STORAGE_ACCOUNT_NAME --resource-group $RESOURCE_GROUP -o tsv --query id)
      ```
    - Create an Event Hub name space:
      ```bash
@@ -133,10 +142,16 @@
      echo fs.file-max = 100000 | sudo tee -a /etc/sysctl.conf
      sudo sysctl -p
      ```
-- Check k3s installation
+- Check K3s installation
   ```bash
   kubectl get node
   ```
+- Install k9s
+    ```bash
+    sudo snap install k9s
+    alias k9s=/snap/k9s/current/bin/k9s
+    echo "alias k9s=/snap/k9s/current/bin/k9s" >> ~/.bashrc
+    ```
 - Install Azure prerequisites
   - Install `Azure CLI`:
     ```bash
@@ -144,11 +159,12 @@
     ```
   - Install `Azure arc extension`:
     ```bash
-    az extension add --allow-preview true --name connectedk8s
+    curl -L -o connectedk8s-1.10.0-py2.py3-none-any.whl https://github.com/AzureArcForKubernetes/azure-cli-extensions/raw/refs/heads/connectedk8s/public/cli-extensions/connectedk8s-1.10.0-py2.py3-none-any.whl  
+    az extension add --upgrade --source connectedk8s-1.10.0-py2.py3-none-any.whl
     ```
-  - Install `Azure IoT Operations extension` (v0.5.1b1, to be able to use the Data Processor component):
+  - Install `Azure IoT Operations extension`:
     ```bash
-    az extension add --allow-preview true --name azure-iot-ops --version 0.5.1b1
+    az extension add --upgrade --allow-preview true --name azure-iot-ops
     ```
 
 - Prepare your Cluster for Azure IoT Operations

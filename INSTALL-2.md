@@ -9,7 +9,7 @@
      $SUBSCRIPTION_ID
      $LOCATION
      $RESOURCE_GROUP
-     $KEYVAULT_NAME
+     $SCHEMA_REGISTRY_NAME
      $EVENTHUB_NAMESPACE
      $EVENTHUB_NAME
      ```
@@ -27,20 +27,44 @@
      ```
    - Connect Kubernetes Cluster to Azure:
      ```bash
-     az connectedk8s connect --name $CLUSTER_NAME --location $LOCATION --resource-group $RESOURCE_GROUP --subscription $SUBSCRIPTION_ID
+     az connectedk8s connect --name $CLUSTER_NAME --location $LOCATION --resource-group $RESOURCE_GROUP --subscription $SUBSCRIPTION_ID --enable-oidc-issuer --enable-workload-identity
      ```
+   - Get the cluster's issuer URL
+      ```bash
+      az connectedk8s show --resource-group $RESOURCE_GROUP --name $CLUSTER_NAME --query oidcIssuerProfile.issuerUrl --output tsv
+      ```  
+      Save the output of this command to use in the next steps.
+   - Create a K3s configuration file
+      ```bash
+      sudo nano /etc/rancher/k3s/config.yaml
+      ```
+   - Add the following content to the config.yaml file, replacing the <SERVICE_ACCOUNT_ISSUER> placeholder with your cluster's issuer URL.
+      ```bash
+      kube-apiserver-arg:
+        - service-account-issuer=<SERVICE_ACCOUNT_ISSUER>
+        - service-account-max-token-expiration=24h
+      ```
+   - Save the file and exit the text editor
    - Enable Custom Location support:
      ```bash
      az connectedk8s enable-features --name $CLUSTER_NAME --resource-group $RESOURCE_GROUP --custom-locations-oid $OBJECT_ID --features cluster-connect custom-locations
      ```
+   - Restart K3s
+      ```bash
+      sudo systemctl restart k3s
+      ```
 
-#### Deploy and configure Azure IoT Operations (v0.5.1b1)
+#### Deploy and configure Azure IoT Operations
 
 - Deploy Azure IoT Operations
-   - Deploy Azure IoT Operations:
+   - Prepare your cluster with the dependencies that Azure IoT Operations requires:
      ```bash
-     az iot ops init --kubernetes-distro k3s --include-dp --simulate-plc --cluster $CLUSTER_NAME --resource-group $RESOURCE_GROUP --kv-id /subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.KeyVault/vaults/$KEYVAULT_NAME
+     az iot ops init --cluster $CLUSTER_NAME --resource-group $RESOURCE_GROUP --sr-resource-id /subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.DeviceRegistry/schemaRegistries/$SCHEMA_REGISTRY_NAME
      ```
+   - Deploy Azure IoT Operations:
+      ```bash
+      az iot ops create --add-insecure-listener --name $CLUSTER_NAME-ops-instance --cluster $CLUSTER_NAME --resource-group $RESOURCE_GROUP
+      ```
 
 - Confirm Azure IoT Operations installation  
     - After the deployment is complete, use `az iot ops check` to evaluate IoT Operations service deployment for health, configuration, and usability. The check command can help you find problems in your deployment and configuration.  
