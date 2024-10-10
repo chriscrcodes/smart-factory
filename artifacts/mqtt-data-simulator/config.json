@@ -1,6 +1,6 @@
 {
   "mqtt_broker": {
-      "address": "aio-broker-insecure",
+      "address": "broker.hivemq.com",
       "port": 1883
   },
   "root_topic": "LightningCars",
