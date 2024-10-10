@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: azure-iot-operations
+  name: mqtt-data-simulator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mqtt-data-simulator
+  template:
+    metadata:
+      labels:
+        app: mqtt-data-simulator
+    spec:
+      containers:
+      - name: mqtt-data-simulator
+        image: ghcr.io/chriscrcodes/mqtt-data-simulator:latest
+        volumeMounts:
+          - name: config-volume
+            mountPath: /app/config.json
+            subPath: config.json
+      volumes:
+        - name: config-volume
+          configMap:
+            name: mqtt-config

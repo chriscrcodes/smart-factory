@@ -13,7 +13,7 @@ import pyfiglet
 colorama.init(autoreset=True)
 
 # Constants
-CONFIG_FILE_PATH = 'config.json'  # Path to the configuration file
+CONFIG_FILE_PATH = '/app/config.json'  # Path to the configuration file
 DEFAULT_PUBLISH_INTERVAL = 5  # Default interval is 5 seconds
 MQTT_PROTOCOL = mqtt.MQTTv5  # MQTT protocol version
 
@@ -31,25 +31,37 @@ def load_config(file_path):
 
 # Generate data based on the provided tag configuration
 def generate_data(tag_config):
-    # If a constant value is provided, return it
+    # Handle constant values
     if 'constant' in tag_config:
         return tag_config['constant']
 
-    # Randomized data generation based on type
+    # Handle boolean values (random True/False)
     if tag_config.get('type') == 'boolean':
-        return random.choice([True, False])  # Random boolean value
+        return random.choice([True, False])  # Always random
+
+    # Randomized data generation for numeric types
     if 'mean' in tag_config and 'deviation' in tag_config:
-        # Calculate a value within the mean ± deviation range
         value_range = (tag_config['mean'] - tag_config['deviation'], 
                        tag_config['mean'] + tag_config['deviation'])
         if tag_config['type'] in ['int', 'float', 'double']:
-            return round(random.uniform(*value_range), 2)  # Random float/int
-        if tag_config['type'] == 'datetime':
-            return datetime.now(timezone.utc).isoformat()  # Current UTC time
-        if tag_config['type'] == 'string':
-            return f"SampleString_{random.randint(1, 100)}"  # Random string
-        if tag_config['type'] == 'guid':
-            return str(uuid.uuid4())  # Generate a UUID
+            return round(random.uniform(*value_range), 2)
+
+    # Handling for min_value, max_value, increment_step with reset
+    if 'min_value' in tag_config and 'max_value' in tag_config:
+        value = tag_config.setdefault('current_value', tag_config['min_value'])
+        value += tag_config.get('increment_step', 1)
+        if value >= tag_config['max_value']:
+            value = 0  # Reset to 0 after max_value is reached
+        tag_config['current_value'] = value
+        return value
+
+    # Generate datetime, string, and UUID types
+    if tag_config['type'] == 'datetime':
+        return datetime.now(timezone.utc).isoformat()  # Current UTC time
+    if tag_config['type'] == 'string':
+        return f"SampleString_{random.randint(1, 100)}"  # Random string
+    if tag_config['type'] == 'guid':
+        return str(uuid.uuid4())  # Generate a UUID
 
     # Return a default value if none of the conditions are met
     return tag_config.get('value')
@@ -61,9 +73,8 @@ def publish_data(client, root_topic, topics, data):
         data['Timestamp'] = datetime.now(timezone.utc).isoformat()
         for topic in topics:
             full_topic = f"{root_topic}/{topic}"  # Construct the full topic name
-            data['Location'] = full_topic  # Set Location to the full topic name
-            # Publish the data as a JSON string
-            client.publish(full_topic, json.dumps(data))
+            data['UNS'] = full_topic  # Set UNS to the full topic name
+            client.publish(full_topic, json.dumps(data))  # Publish the data as a JSON string
             print(f"{Fore.GREEN}{datetime.now(timezone.utc).isoformat()} - Published data to topic '{full_topic}': {data}")
     except Exception as e:
         print(f"{Fore.RED}Error publishing data: {str(e)}")  # Error handling
