@@ -6,137 +6,195 @@ from datetime import datetime, timezone
 import uuid
 import ssl
 import colorama
+import logging
 from colorama import Fore, Style
 import pyfiglet
+from typing import Any, Dict, List, Optional, Callable
 
 # Initialize Colorama for colored terminal output
 colorama.init(autoreset=True)
 
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
 # Constants
-CONFIG_FILE_PATH = '/app/config.json'  # Path to the configuration file
-DEFAULT_PUBLISH_INTERVAL = 5  # Default interval is 5 seconds
-MQTT_PROTOCOL = mqtt.MQTTv5  # MQTT protocol version
+DEFAULT_PUBLISH_INTERVAL = 1  # Default publish interval in seconds
 
-# Function to display an ASCII banner and author information
-def display_banner():
-    banner = pyfiglet.figlet_format("MQTT Data Simulator")  # Generate ASCII art
-    author_info = f"{Fore.CYAN}Author: Christophe Crémon\n"
-    website_info = f"{Fore.CYAN}Website: https://github.com/chriscrcodes"
-    print(f"{Fore.YELLOW}{banner}{Style.RESET_ALL}{author_info}{website_info}")
+def handle_exception(func: Callable) -> Callable:
+    """Decorator to handle exceptions and log them."""
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            logging.error(f"{Fore.RED}Error in {func.__name__}: {str(e)}")
+            raise
+    return wrapper
 
-# Load configuration from a JSON file
-def load_config(file_path):
-    with open(file_path, 'r') as file:  # Open the configuration file
-        return json.load(file)  # Load and return the JSON data
-
-# Generate data based on the provided tag configuration
-def generate_data(tag_config):
-    # Handle constant values
-    if 'constant' in tag_config:
-        return tag_config['constant']
-
-    # Handle boolean values (random True/False)
-    if tag_config.get('type') == 'boolean':
-        return random.choice([True, False])  # Always random
-
-    # Randomized data generation for numeric types
-    if 'mean' in tag_config and 'deviation' in tag_config:
-        value_range = (tag_config['mean'] - tag_config['deviation'], 
-                       tag_config['mean'] + tag_config['deviation'])
-        if tag_config['type'] in ['int', 'float', 'double']:
-            return round(random.uniform(*value_range), 2)
-
-    # Handling for min_value, max_value, increment_step with reset
-    if 'min_value' in tag_config and 'max_value' in tag_config:
-        value = tag_config.setdefault('current_value', tag_config['min_value'])
-        value += tag_config.get('increment_step', 1)
-        if value >= tag_config['max_value']:
-            value = 0  # Reset to 0 after max_value is reached
-        tag_config['current_value'] = value
-        return value
-
-    # Generate datetime, string, and UUID types
-    if tag_config['type'] == 'datetime':
-        return datetime.now(timezone.utc).isoformat()  # Current UTC time
-    if tag_config['type'] == 'string':
-        return f"SampleString_{random.randint(1, 100)}"  # Random string
-    if tag_config['type'] == 'guid':
-        return str(uuid.uuid4())  # Generate a UUID
-
-    # Return a default value if none of the conditions are met
-    return tag_config.get('value')
-
-# Publish data to the specified MQTT topics
-def publish_data(client, root_topic, topics, data):
-    try:
-        # Add a UTC timestamp to the data
-        data['Timestamp'] = datetime.now(timezone.utc).isoformat()
-        for topic in topics:
-            full_topic = f"{root_topic}/{topic}"  # Construct the full topic name
-            data['UNS'] = full_topic  # Set UNS to the full topic name
-            client.publish(full_topic, json.dumps(data))  # Publish the data as a JSON string
-            print(f"{Fore.GREEN}{datetime.now(timezone.utc).isoformat()} - Published data to topic '{full_topic}': {data}")
-    except Exception as e:
-        print(f"{Fore.RED}Error publishing data: {str(e)}")  # Error handling
-
-# Connect to the MQTT broker
-def connect_mqtt(config):
-    client = mqtt.Client(protocol=MQTT_PROTOCOL)  # Create an MQTT client instance
-
-    # Set username and password if provided
-    if 'username' in config['mqtt_broker'] and 'password' in config['mqtt_broker']:
-        client.username_pw_set(config['mqtt_broker']['username'], config['mqtt_broker']['password'])
-
-    # Handle TLS settings if enabled in configuration
-    if config['mqtt_broker'].get('use_tls', False):
-        client.tls_set(certfile=config['mqtt_broker'].get('certfile'), 
-                       keyfile=config['mqtt_broker'].get('keyfile'), 
-                       cert_reqs=ssl.CERT_REQUIRED, 
-                       tls_version=ssl.PROTOCOL_TLSv1_2)
-
-    # Attempt to connect to the MQTT broker
-    try:
-        client.connect(config['mqtt_broker']['address'], config['mqtt_broker']['port'])
-        print(f"{Fore.GREEN}Connected to MQTT broker at {config['mqtt_broker']['address']}:{config['mqtt_broker']['port']}")
-        return client  # Return the connected client
-    except Exception as e:
-        print(f"{Fore.RED}Connection error: {str(e)}")  # Error handling
-        return None
-
-# Main function to handle the publishing loop
-def start_publishing(config):
-    client = connect_mqtt(config)  # Connect to the MQTT broker
-    if client is None:
-        return  # Exit if connection failed
-
-    # Start the MQTT client loop to handle network events
-    client.loop_start()
+class MqttDataSimulator:
+    """Simulate MQTT data publishing based on a configuration."""
     
-    try:
-        while True:
-            for topic_config in config['topics']:  # Iterate over each topic in the config
-                topics = topic_config['topics']  # Extract the list of topics
-                # Generate data for each tag in the configuration
-                data = {tag['tag']: generate_data(tag) for tag in topic_config.get('tags', [])}
-                
-                # Publish generated data to all specified topics
-                publish_data(client, config['root_topic'], topics, data)
+    def __init__(self, config_file_path: str = 'config.json'):
+        self.config_file_path = config_file_path
+        self.client: Optional[mqtt.Client] = None
+        self.config = self.load_config()
+        self.configure_mqtt()
 
-            time.sleep(config['publish_interval'])  # Sleep for the configured interval
-    except KeyboardInterrupt:
-        print(f"{Fore.YELLOW}Stopping the publisher...")  # Graceful exit on interrupt
-    finally:
-        client.loop_stop()  # Stop the MQTT client loop
-        client.disconnect()  # Disconnect from the MQTT broker
+    def display_banner(self) -> None:
+        """Display the ASCII banner and author information."""
+        banner = pyfiglet.figlet_format("MQTT Data Simulator")
+        author_info = f"{Fore.CYAN}Author: Christophe Crémon\n"
+        website_info = f"{Fore.CYAN}Website: https://github.com/chriscrcodes"
+        print(f"{Fore.YELLOW}{banner}{Style.RESET_ALL}{author_info}{website_info}")
+
+    @handle_exception
+    def load_config(self) -> Dict[str, Any]:
+        """Load configuration from a JSON file."""
+        with open(self.config_file_path, 'r') as file:
+            config = json.load(file)
+        self.validate_config(config)
+        return config
+
+    @handle_exception
+    def validate_config(self, config: Dict[str, Any]) -> None:
+        """Validate the configuration settings."""
+        if 'mqtt_broker' not in config:
+            raise ValueError("MQTT broker configuration is missing.")
+        config.setdefault('publish_interval', DEFAULT_PUBLISH_INTERVAL)
+
+    @handle_exception
+    def configure_mqtt(self) -> None:
+        """Configure MQTT client settings."""
+        self.client = mqtt.Client(protocol=mqtt.MQTTv5)
+        mqtt_broker = self.config['mqtt_broker']
+        self.client.username_pw_set(mqtt_broker.get('username'), mqtt_broker.get('password'))
+
+        # Setup TLS if required
+        if mqtt_broker.get('use_tls', False):
+            self.client.tls_set(
+                certfile=mqtt_broker.get('certfile'),
+                keyfile=mqtt_broker.get('keyfile'),
+                cert_reqs=ssl.CERT_REQUIRED,
+                tls_version=ssl.PROTOCOL_TLSv1_2
+            )
+
+    @handle_exception
+    def connect_mqtt(self) -> None:
+        """Connect to the MQTT broker."""
+        mqtt_broker = self.config['mqtt_broker']
+        self.client.connect(mqtt_broker['address'], mqtt_broker['port'])
+        logging.info(f"{Fore.GREEN}Connected to MQTT broker at {mqtt_broker['address']}:{mqtt_broker['port']} 🚀")
+
+    def handle_increment_step(self, tag_config: Dict[str, Any]) -> Any:
+        """Handle increment and decrement logic for the tag value."""
+        current_value = tag_config.get('current_value', tag_config['min_value'])
+        now = datetime.now(timezone.utc)
+
+        # Initialize last_update if not already set
+        tag_config.setdefault('last_update', now)
+
+        elapsed_time = (now - tag_config['last_update']).total_seconds()
+        if elapsed_time >= tag_config.get('update_interval', 0):
+            step = tag_config.get('increment_step', 0) - tag_config.get('decrement_step', 0)
+            current_value = max(tag_config['min_value'], min(current_value + step, tag_config['max_value']))
+
+            # Reset to min_value if necessary
+            if current_value > tag_config['max_value']:
+                current_value = tag_config['min_value'] if tag_config.get('reset', False) else tag_config['max_value']
+
+            tag_config['current_value'] = current_value
+            tag_config['last_update'] = now
+            logging.debug(f"Updated current value to {current_value} (step: {step})")
+
+        return current_value
+
+    @handle_exception
+    def generate_data(self, tag_config: Dict[str, Any]) -> Any:
+        """Generate data based on the tag configuration."""
+        tag_type = tag_config.get('type')
+
+        if 'constant' in tag_config:
+            logging.debug(f"Generating constant value: {tag_config['constant']}")
+            return tag_config['constant']
+
+        if tag_type == 'boolean':
+            value = random.choice([True, False])
+            logging.debug(f"Generated boolean value: {value}")
+            return value
+
+        if tag_config.get('mean') is not None and tag_config.get('deviation') is not None:
+            value = round(random.uniform(tag_config['mean'] - tag_config['deviation'], 
+                                          tag_config['mean'] + tag_config['deviation']), 2)
+            logging.debug(f"Generated value in range ({tag_config['mean'] - tag_config['deviation']}, "
+                          f"{tag_config['mean'] + tag_config['deviation']}): {value}")
+            return value
+
+        if 'min_value' in tag_config and 'max_value' in tag_config:
+            return self.handle_increment_step(tag_config)
+
+        return self.handle_other_data_types(tag_config)
+
+    @handle_exception
+    def handle_other_data_types(self, tag_config: Dict[str, Any]) -> Any:
+        """Handle other data types such as datetime, string, and UUID."""
+        tag_type = tag_config['type']
+        if tag_type == 'datetime':
+            value = datetime.now(timezone.utc).isoformat()
+            logging.debug(f"Generated datetime value: {value}")
+            return value
+        elif tag_type == 'string':
+            value = f"SampleString_{random.randint(1, 100)}"
+            logging.debug(f"Generated string value: {value}")
+            return value
+        elif tag_type == 'guid':
+            value = str(uuid.uuid4())
+            logging.debug(f"Generated GUID value: {value}")
+            return value
+        return tag_config.get('value')
+
+    @handle_exception
+    def publish_data(self, root_topic: str, topics: List[str], data: Dict[str, Any]) -> None:
+        """Publish generated data to specified MQTT topics."""
+        data['Timestamp'] = datetime.now(timezone.utc).isoformat()
+        
+        for topic in topics:
+            full_topic = f"{root_topic}/{topic}"
+            data['UNS'] = full_topic  # Keep the UNS value updated
+
+            # Split UNS and check the number of components
+            uns_components = data['UNS'].split('/')
+            if len(uns_components) != 5:
+                logging.warning(f"{Fore.YELLOW}UNS '{data['UNS']}' does not have exactly 5 components. Data will be skipped.")
+                continue
+            
+            data.update(dict(zip(['Enterprise', 'Site', 'Area', 'Line', 'Cell'], uns_components)))
+
+            self.client.publish(full_topic, json.dumps(data))
+            logging.info(f"{Fore.BLUE}{data['Timestamp']} - Published data to topic '{full_topic}': {data} 📡")
+
+    def start_publishing(self) -> None:
+        """Start the main publishing loop."""
+        try:
+            self.connect_mqtt()
+            self.client.loop_start()
+
+            while True:
+                for topic_config in self.config['topics']:
+                    topics = topic_config['topics']
+                    data = {tag['tag']: self.generate_data(tag) for tag in topic_config.get('tags', [])}
+                    self.publish_data(self.config['root_topic'], topics, data)
+                time.sleep(self.config['publish_interval'])  # Publish interval from config
+        except KeyboardInterrupt:
+            logging.info(f"{Fore.YELLOW}Stopping the publisher... 🛑")
+        except Exception as e:
+            logging.error(f"{Fore.RED}An error occurred during publishing: {str(e)}")
+        finally:
+            self.client.loop_stop()
+            self.client.disconnect()
 
 if __name__ == "__main__":
-    display_banner()  # Display the banner
-
-    # Load the configuration from the JSON file
-    config = load_config(CONFIG_FILE_PATH)
-
-    # Set a default publish interval if not specified in the config
-    config.setdefault('publish_interval', DEFAULT_PUBLISH_INTERVAL)
-
-    # Start the publishing process
-    start_publishing(config)
+    try:
+        simulator = MqttDataSimulator()
+        simulator.display_banner()
+        simulator.start_publishing()
+    except Exception as e:
+        logging.error(f"{Fore.RED}Fatal error in the simulator: {str(e)}")
