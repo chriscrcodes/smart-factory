@@ -112,7 +112,7 @@
           { "tag": "IdealCycleTime", "value": 38.0, "type": "constant" },
           { "tag": "EnergyConsumption", "mean": 11.0, "deviation": 0.5, "type": "float" },
           { "tag": "Temperature", "mean": 85.0, "deviation": 3.0, "type": "float" },
-          { "tag": "Shift", "type": "int", "min_value": 14, "max_value": 16, "increment_step": 1, "update_interval": 28800 },
+          { "tag": "Shift", "type": "int", "min_value": 13, "max_value": 15, "increment_step": 1, "update_interval": 28800 },
           { "tag": "Downtime", "mean": 15, "deviation": 2, "type": "int" } 
         ]
       }
