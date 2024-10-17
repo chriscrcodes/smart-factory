@@ -1,0 +1,71 @@
+apiVersion: connectivity.iotoperations.azure.com/v1beta1
+kind: DataflowEndpoint
+metadata:
+  name: mqtt-source
+  namespace: azure-iot-operations
+spec:
+  endpointType: Mqtt
+  mqttSettings:
+    host: "aio-broker:18883"
+    tls:
+      mode: Enabled
+      trustedCaCertificateConfigMapRef: azure-iot-operations-aio-ca-trust-bundle
+    authentication:
+      method: ServiceAccountToken
+      serviceAccountTokenSettings:
+        audience: aio-internal
+---
+apiVersion: connectivity.iotoperations.azure.com/v1beta1
+kind: Dataflow
+metadata:
+  name: bronze-to-silver
+  namespace: azure-iot-operations
+spec:
+  profileRef: silver-dataflow
+  operations:
+    - operationType: source
+      sourceSettings:
+        endpointRef: mqtt-source
+        dataSources:
+        - LightningCars/# # <TOPIC>
+    - operationType: builtInTransformation
+      builtInTransformationSettings:
+        map:
+          - inputs:
+              - '*'
+            output: '*'
+          - inputs:
+              - '$context(products).ProductId'
+            output: ProductId
+          - inputs:
+              - '$context(operators).Hours'
+            output: ShiftHours
+          - inputs:
+              - '$context(operators).EmployeeId'
+            output: EmployeeId
+        datasets:
+         - key: products
+           inputs:
+             - '$source.Cell'               # - $1
+             - '$context(products).Cell'    # - $2
+           expression: '$1 == $2'
+         - key: operators
+           inputs:
+             - '$source.Shift'              # - $1
+             - '$context(operators).Shift'  # - $2
+           expression: '$1 == $2'
+    - operationType: destination
+      destinationSettings:
+        endpointRef: mqtt-source
+        dataDestination: Silver
+---
+apiVersion: connectivity.iotoperations.azure.com/v1beta1
+kind: DataflowProfile
+metadata:
+  name: silver-dataflow
+  namespace: azure-iot-operations
+spec:
+  instanceCount: 1
+  diagnostics:
+    logs:
+      level: "debug"

@@ -28,7 +28,11 @@
     $ASSISTANT_TENANT
     $AZURE_OPENAI_KEY
     ```
-- Retrieve the Fabric endpoint from [Fabric homepage](https://app.fabric.microsoft.com/home) > `Settings` > `Manage connections and gateways`
+- Select 'Real-Time Intelligence' from the [Fabric homepage](https://app.powerbi.com/home?experience=kusto).  
+![fabric-home](./artifacts/media/fabric-home.png "fabric-home")
+- Click on `Workspaces` > `Smart Factory`
+- Select the database `AIO` (type: `KQL Database`)
+- Retrieve the Fabric endpoint from `Overview` > `Query URI` > click `Copy URI`
 - `Connections` > copy the name of your Fabric endpoint (Connection type: `Azure Data Explorer (Kusto)`)
 - Modify environment variables in `.env` file
     ```bash
@@ -52,7 +56,7 @@
     - Execute the following commands:
         ```bash
         pip install -r requirements.txt
-        streamlit run .\frontend.py
+        streamlit run .\app.py
         ```
 - Option 2 (Docker)
     - Start a terminal from the [directory](./artifacts/factory-assistant/)

@@ -18,9 +18,9 @@
 1. Click on `Get data` > `Local file` > `New table` > type `operators`
 2. Upload the file [operators.csv](./artifacts/templates/fabric/reference-datasets/operators.csv) > `Next`  
 ![fabric-upload](./artifacts/media/fabric_operators-1.png "fabric-upload")
-3. Click on `Edit columns` > set `EmployeeId` column as Type `string` and click `Apply`
+3. Click on `First row is column header` > then `Edit columns` > set `EmployeeId` column as Type `string` and click `Apply`  
 ![fabric-columnsedit](./artifacts/media/fabric_operators-2.png "fabric-columnsedit")
-4. Click on `First row is column header` > `Finish`, wait for the ingestion (status "Successfully ingested") and click `Close`
+4. Click `Finish`, wait for the ingestion (status "Successfully ingested") and click `Close`
 ![fabric-columns](./artifacts/media/fabric_operators-3.png "fabric-columns")
 - Create the table for `assets` dataset
 1. Click on `Get data` > `Local file` > `New table` > type `assets`
@@ -41,7 +41,7 @@
 - Add the following query:
     ```
     .create table aio_silver (
-        Timestamp: datetime,
+        Timestamp: string,
         UNS: string,
         Enterprise: string,
         Site: string,
@@ -60,7 +60,7 @@
         Temperature: real,
         Shift: real,
         ShiftHours: string, 
-        EmployeeId: real,
+        EmployeeId: string,
         ProductId: real
     )
     ```
@@ -87,10 +87,11 @@
     | limit 0
     ```
 - Select the query portion and click `Run` to create the table `aio_gold`
-- You should now see 4 tables:  
-![fabric-tables](./artifacts/media/fabric5.png "fabric-tables")
+- You should now see 5 tables:  
+![fabric-tables](./artifacts/media/fabric-tables.png "fabric-tables")
 
 #### Disable streaming ingestion
+- Select the query set `AIO_queryset`
 - Add the following query:
     ```
     .alter table aio_silver policy streamingingestion disable
@@ -113,7 +114,7 @@
      ```
 - Add the following query:
     ```
-    .add database <YOUR_DATABASE> viewers ('aadapp=<ASSISTANT_APP_ID>;<ASSISTANT_TENANT>') "Gen AI Factory Assistant"
+    .add database AIO viewers ('aadapp=<ASSISTANT_APP_ID>;<ASSISTANT_TENANT>') "Gen AI Factory Assistant"
     ```
 - Select the query portion and click `Run`
 
@@ -139,40 +140,43 @@
     - Retrieve variables created in [Part 1 - Provision resources (Edge and Cloud)](./INSTALL-1.md) ==> **Note(1)**
     - `Event Hub namespace` > `$EVENTHUB_NAMESPACE` variable
     - `Event Hub` > `$EVENTHUB_NAME` variable
+    - Choose a connection name
     - `Shared Access Key Name` > `$EVENTHUB_KEYNAME` variable
     - `Shared Access Key` > `$EVENTHUB_KEY` variable
-    - Click `Create`
-    - Check if the event hub is select in `Cloud connection`
-    - `Consumer group` > `Create new` > type `Fabric` and click `Done`
+    - Tick the box `Test connection` and click `Create`
+    - Select the event hub connection in `Cloud connection`
+    - `Consumer group` > `Create new` > type `fabric` and click `Done`
     - `Data format` > select `Json`
     - Tick the box `Activate streaming after adding data source` and click `Add`
 
 2. Configure event stream destination
     - Click on `New destination` > `KQL Database`
-    - Select `Event processing before ingestion`
+    - Tick the box `Event processing before ingestion`
     - Choose a `Destination name`
     - `Workspace` > select `Smart Factory`
-    - `KQL Database` > select your database
+    - `KQL Database` > select the database `AIO`
     - `Destination table` > select `aio_silver`
     - `Input data format` > `Json`
-    - Tick the box `Activate streaming after adding data source` and click `Add`
+    - Tick the box `Activate streaming after adding data source`
 
 3. Configure fields mapping
     - Click `Open event processor`
     - A new wizard will open
-    - Select `aio_silver` > `+ (plus sign)` > `Manage fields`
-    - `Operation name` > keep `Managefields1`
+    - Remove connection from `aio_silver` to `KQLDatabase1`
+    - Select `aio_silver` > `Operations` > `Manage fields`
+    - Connect `Managefields1` to `KQLDatabase1`
+    - Connect `aio_silver` to `Managefields1`
     - Click `Add all fields`
     - Go to the end of the list of fields and remove the 3 following fields:
         - `EventProcessedUtcTime`
         - `PartitionId`
         - `EventEnqueuedUtcTime`
         - (`...` and `Remove`)
-        ![fabric-eventstream-2](./artifacts/media/fabric6.png "fabric-eventstream-2")
+        ![fabric-eventstream-1](./artifacts/media/fabric_eventstream-1.png "fabric-eventstream-1")
         - Click `Done` twice
-    - Click `Add`
+    - Click `Add`    
 
-        ![fabric-eventstream](./artifacts/media/fabric7.png "fabric-eventstream")
+        ![fabric-eventstream-2](./artifacts/media/fabric_eventstream-2.png "fabric-eventstream-2")
 
 #### Confirm that the Data stream is connected
 - Click on `Workspaces` > `Smart Factory`

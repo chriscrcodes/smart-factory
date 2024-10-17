@@ -1,0 +1,126 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mqtt-data-simulator-config
+  namespace: azure-iot-operations
+data:
+  config.json: |
+    {
+      "mqtt_broker": {
+          "address": "aio-broker-insecure",
+          "port": 1883
+      },
+      "root_topic": "LightningCars",
+      "topics": [
+        {
+            "topics": [
+            "Austin/Stamping/Line1/PIBIDT",
+            "Austin/Welding/Line1/I1IX2I",
+            "Austin/Painting/Line1/48H0LP",
+            "Austin/Assembly/Line1/82TFFU",
+            "Austin/Inspection/Line1/9OMOSD"
+            ],
+            "tags": [
+            { "tag": "Latitude", "value": 30.2672, "type": "constant" },
+            { "tag": "Longitude", "value": -97.7431, "type": "constant" },
+            { "tag": "PlannedProductionTime", "value": 72000, "type": "constant" },
+            { "tag": "OperatingTime", "type": "int", "min_value": 60000, "max_value": 64000, "increment_step": 500, "update_interval": 3600 },
+            { "tag": "TotalPartsCount", "type": "int", "min_value": 800, "max_value": 1200, "update_interval": 7200 },
+            { "tag": "GoodPartsCount", "type": "int", "min_value": 500, "max_value": 900, "update_interval": 7200 },
+            { "tag": "IdealCycleTime", "value": 52.0, "type": "constant" },
+            { "tag": "EnergyConsumption", "mean": 10.0, "deviation": 0.5, "type": "float" },
+            { "tag": "Temperature", "mean": 85.0, "deviation": 3.0, "type": "float" },
+            { "tag": "Shift", "type": "int", "min_value": 1, "max_value": 3, "increment_step": 1, "update_interval": 28800 },
+            { "tag": "Downtime", "mean": 15, "deviation": 2, "type": "int" } 
+            ]
+        },
+        {
+            "topics": [
+            "Buffalo/Stamping/Line1/9VR7RO",
+            "Buffalo/Welding/Line1/JKTB4G",
+            "Buffalo/Painting/Line1/SDZI4E",
+            "Buffalo/Assembly/Line1/MHB89D",
+            "Buffalo/Inspection/Line1/RZ8BO8"
+            ],
+            "tags": [
+            { "tag": "Latitude", "value": 42.8864, "type": "constant" },
+            { "tag": "Longitude", "value": -78.8784, "type": "constant" },
+            { "tag": "PlannedProductionTime", "value": 72000, "type": "constant" },
+            { "tag": "OperatingTime", "type": "int", "min_value": 59000, "max_value": 63000, "increment_step": 500, "update_interval": 3600 },
+            { "tag": "TotalPartsCount", "type": "int", "min_value": 700, "max_value": 900, "update_interval": 7200 },
+            { "tag": "GoodPartsCount", "type": "int", "min_value": 500, "max_value": 800, "update_interval": 7200 },
+            { "tag": "IdealCycleTime", "value": 55.0, "type": "constant" },
+            { "tag": "EnergyConsumption", "mean": 10.0, "deviation": 0.5, "type": "float" },
+            { "tag": "Temperature", "mean": 85.0, "deviation": 3.0, "type": "float" },
+            { "tag": "Shift", "type": "int", "min_value": 4, "max_value": 6, "increment_step": 1, "update_interval": 28800 },
+            { "tag": "Downtime", "mean": 15, "deviation": 2, "type": "int" } 
+            ]
+        },
+        {
+            "topics": [
+            "Berlin/Stamping/Line1/7H27L4",
+            "Berlin/Welding/Line1/LP0HNU",
+            "Berlin/Painting/Line1/X78TFV",
+            "Berlin/Assembly/Line1/07RIRW",
+            "Berlin/Inspection/Line1/NVIIRV"
+            ],
+            "tags": [
+            { "tag": "Latitude", "value": 52.5200, "type": "constant" },
+            { "tag": "Longitude", "value": 13.4050, "type": "constant" },
+            { "tag": "PlannedProductionTime", "value": 72000, "type": "constant" },
+            { "tag": "OperatingTime", "type": "int", "min_value": 69000, "max_value": 71000, "increment_step": 500, "update_interval": 3600 },
+            { "tag": "TotalPartsCount", "type": "int", "min_value": 1400, "max_value": 1600, "update_interval": 7200 },
+            { "tag": "GoodPartsCount", "type": "int", "min_value": 1350, "max_value": 1550, "update_interval": 7200 },
+            { "tag": "IdealCycleTime", "value": 35.0, "type": "constant" },
+            { "tag": "EnergyConsumption", "mean": 12.0, "deviation": 0.5, "type": "float" },
+            { "tag": "Temperature", "mean": 85.0, "deviation": 3.0, "type": "float" },
+            { "tag": "Shift", "type": "int", "min_value": 7, "max_value": 9, "increment_step": 1, "update_interval": 28800 },
+            { "tag": "Downtime", "mean": 15, "deviation": 2, "type": "int" } 
+            ]
+        },
+        {
+            "topics": [
+            "Berlin/Stamping/Line2/834C8X",
+            "Berlin/Welding/Line2/IMHAO0",
+            "Berlin/Painting/Line2/EJAOET",
+            "Berlin/Assembly/Line2/MI9VEP",
+            "Berlin/Inspection/Line2/BI2BI0"
+            ],
+            "tags": [
+            { "tag": "Latitude", "value": 52.5200, "type": "constant" },
+            { "tag": "Longitude", "value": 13.4050, "type": "constant" },
+            { "tag": "PlannedProductionTime", "value": 72000, "type": "constant" },
+            { "tag": "OperatingTime", "type": "int", "min_value": 69000, "max_value": 71000, "increment_step": 500, "update_interval": 3600 },
+            { "tag": "TotalPartsCount", "type": "int", "min_value": 1400, "max_value": 1600, "update_interval": 7200 },
+            { "tag": "GoodPartsCount", "type": "int", "min_value": 1350, "max_value": 1550, "update_interval": 7200 },
+            { "tag": "IdealCycleTime", "value": 35.0, "type": "constant" },
+            { "tag": "EnergyConsumption", "mean": 12.0, "deviation": 0.5, "type": "float" },
+            { "tag": "Temperature", "mean": 85.0, "deviation": 3.0, "type": "float" },
+            { "tag": "Shift", "type": "int", "min_value": 10, "max_value": 12, "increment_step": 1, "update_interval": 28800 },
+            { "tag": "Downtime", "mean": 15, "deviation": 2, "type": "int" } 
+            ]
+        },
+        {
+            "topics": [
+            "Shanghai/Mixing/Line1/53FCIU",
+            "Shanghai/Coating/Line1/0CYBFQ",
+            "Shanghai/Drying/Line1/0DKBDE",
+            "Shanghai/Assembly/Line1/LFR8PP",
+            "Shanghai/Inspection/Line1/DR2FB3"
+            ],
+            "tags": [
+            { "tag": "Latitude", "value": 31.2304, "type": "constant" },
+            { "tag": "Longitude", "value": 121.4737, "type": "constant" },
+            { "tag": "PlannedProductionTime", "value": 72000, "type": "constant" },
+            { "tag": "OperatingTime", "type": "int", "min_value": 68000, "max_value": 70000, "increment_step": 500, "update_interval": 3600 },
+            { "tag": "TotalPartsCount", "type": "int", "min_value": 1200, "max_value": 1500, "update_interval": 7200 },
+            { "tag": "GoodPartsCount", "type": "int", "min_value": 1150, "max_value": 1450, "update_interval": 7200 },
+            { "tag": "IdealCycleTime", "value": 38.0, "type": "constant" },
+            { "tag": "EnergyConsumption", "mean": 11.0, "deviation": 0.5, "type": "float" },
+            { "tag": "Temperature", "mean": 85.0, "deviation": 3.0, "type": "float" },
+            { "tag": "Shift", "type": "int", "min_value": 13, "max_value": 15, "increment_step": 1, "update_interval": 28800 },
+            { "tag": "Downtime", "mean": 15, "deviation": 2, "type": "int" } 
+            ]
+        }
+        ]
+    }

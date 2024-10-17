@@ -23,7 +23,7 @@ metadata:
 spec:
   endpointType: Kafka
   kafkaSettings:
-    host: 'evhnsg2cp3syff2y5o.servicebus.windows.net:9093' # <EVENTHUB_NAMESPACE>
+    host: '<EVENTHUB_NAMESPACE>.servicebus.windows.net:9093'
     batching:
       latencyMs: 0
       maxMessages: 100
@@ -32,7 +32,7 @@ spec:
     authentication:
       method: SystemAssignedManagedIdentity
       systemAssignedManagedIdentitySettings:
-        audience: https://evhnsg2cp3syff2y5o.servicebus.windows.net # <EVENTHUB_NAMESPACE>
+        audience: https://<EVENTHUB_NAMESPACE>.servicebus.windows.net
 ---
 apiVersion: connectivity.iotoperations.azure.com/v1beta1
 kind: Dataflow
@@ -46,11 +46,11 @@ spec:
       sourceSettings:
         endpointRef: mqtt-source
         dataSources:
-        - Silver/# # <TOPIC>
+        - Silver/#
     - operationType: destination
       destinationSettings:
         endpointRef: kafka-target
-        dataDestination: aio-silver-realtime # <EVENTHUB>
+        dataDestination: <EVENTHUB>
 ---
 apiVersion: connectivity.iotoperations.azure.com/v1beta1
 kind: DataflowProfile
