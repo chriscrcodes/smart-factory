@@ -56,7 +56,7 @@
     - Execute the following commands:
         ```bash
         pip install -r requirements.txt
-        streamlit run .\app.py
+        streamlit run .\frontend.py
         ```
 - Option 2 (Docker)
     - Start a terminal from the [directory](./artifacts/factory-assistant/)

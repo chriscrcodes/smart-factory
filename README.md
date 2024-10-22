@@ -35,13 +35,13 @@ From `Bronze` (Edge/Simulator) ⇒ `Silver` (Edge/Azure IoT Operations Data Proc
     Industrial machines involved in the process are 'Cells.'  
 
 2. **Azure IoT Operations**  
-    Processes data at Edge: normalize, contextualize, enrich with Edge reference datasets (Operator Data, Production Data) and aggregate every minute.
+    Processes data at Edge: normalize, contextualize, enrich with Edge reference datasets (Operators and Products).
 
 3. **Azure Event Hub**  
     Data ingestion in Azure.     
     
 4. **Microsoft Fabric**  
-    Processes data in Azure: materialize data as a Table, enrich with Cloud reference datasets (Maintenance Data, Directory Data).
+    Processes data in Azure: materialize data as a Table, enrich with Cloud reference datasets (Operators, Assets and Products).
 
 5. **Generative AI Factory Assistant**  
     Introducing a custom Large Language Model (LLM) Factory Assistant, based on OpenAI model 'GPT-4o', that enables natural language communication with the factory. This assistant simplifies the process of retrieving information from various systems and databases.
@@ -63,14 +63,11 @@ From `Bronze` (Edge/Simulator) ⇒ `Silver` (Edge/Azure IoT Operations Data Proc
 **No data from the database is transmitted to the Large Language Model, only the prompt and the schema of the database.**  
     Example query generated in `KQL (Kusto Query Language)`:  
     ```
-    gold
-    | where startofmonth(Timestamp) == startofmonth(now())
-    | summarize TotalUnitsProduced = sum(UnitsProduced), TotalGoodUnitsProduced = sum(GoodUnitsProduced) by Site
-    | extend YieldPercentage = (TotalGoodUnitsProduced * 100.0) / TotalUnitsProduced
-    | project Site, TotalGoodUnitsProduced, TotalUnitsProduced, YieldPercentage
-    | order by YieldPercentage desc, Site asc
-    | take 100
-    | distinct Site, TotalGoodUnitsProduced, TotalUnitsProduced, YieldPercentage
+    aio_gold
+    | where Timestamp >= startofmonth(now())
+    | summarize TotalUnitsProduced = sum(TotalPartsCount), TotalGoodUnits = sum(GoodPartsCount) by Site
+    | extend Yield = TotalGoodUnits / TotalUnitsProduced * 100
+    | limit 100
     ```  
 
 3. **`Backend application (Python)`**: queries the database to retrieve results.  
