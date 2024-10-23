@@ -1,7 +1,6 @@
 ---
 streamlit:
-  title: ":speaking_head_in_silhouette: Talk to your Factory"
-  tab_title: "Talk to your Factory"
-  logo: "./images/smart-factory.jpg"
+  title: "AI Factory Assistant"
+  tab_title: "AI Factory Assistant"
+  logo: "./images/smart-factory.png"
   assistant_intro_message: "How can I help?"
-  about: ":speaking_head_in_silhouette: Talk to your Factory"

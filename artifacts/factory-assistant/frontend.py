@@ -17,7 +17,7 @@ from semantic_kernel.contents.chat_history import ChatHistory
 # Load environment variables from .env file
 load_dotenv()
 
-async def kusto_connect(database, query):
+async def connect_kusto(database: str, query: str) -> str | pd.DataFrame:
     """Establish an asynchronous connection to the Kusto database and execute a query."""
     kcsb = KustoConnectionStringBuilder.with_aad_application_key_authentication(
         os.getenv('KUSTO_CLUSTER'),
@@ -25,16 +25,18 @@ async def kusto_connect(database, query):
         os.getenv('KUSTO_MANAGED_IDENTITY_SECRET'),
         os.getenv('AZURE_AD_TENANT_ID')
     )
-    
+
     async with KustoClient(kcsb) as client:
         try:
             client_execute = await client.execute(database, query)
             results = client_execute.primary_results[0]
-            return results
+            return dataframe_from_result_table(results)
+        except SyntaxError as e:
+            return f"Syntax error in query: {str(e)}"
         except Exception as e:
             return f"Error while executing query: {str(e)}"
 
-def instantiate_kernel():
+def instantiate_kernel() -> tuple[Kernel, str]:
     """Instantiate the Semantic Kernel with the OpenAI service."""
     kernel = Kernel()
     chat_completion = AzureChatCompletion(
@@ -50,7 +52,7 @@ def instantiate_kernel():
     )
     return kernel, plugin
 
-async def agent_kusto(kernel, plugin, prompt, database, table, schema, chat_history):
+async def agent_kusto(kernel: Kernel, plugin: str, prompt: str, database: str, table: str, schema: str, chat_history: ChatHistory) -> str | pd.DataFrame:
     """Generate a Kusto query using the Semantic Kernel and execute it."""
     arguments = KernelArguments(request=prompt, table=table, schema=schema)
     chat_history.add_user_message(prompt)
@@ -64,49 +66,42 @@ async def agent_kusto(kernel, plugin, prompt, database, table, schema, chat_hist
 
         if "kql" not in str(sk_invoke).lower():
             chat_history.add_assistant_message(query_statement)
-            return f"Generated response:\n\n{query_statement}"
-        else:
-            print("\n[DEBUG] QUERY:\n" + query_statement + "\n")
+            return query_statement
 
-        try:
-            execute_query_kusto_db = await kusto_connect(database, query_statement)
-            if isinstance(execute_query_kusto_db, str):
-                return execute_query_kusto_db  # Return the error message
+        print(f"\n[DEBUG] QUERY:\n{query_statement}\n")
 
-            dataframe = dataframe_from_result_table(execute_query_kusto_db)
+        execute_query_kusto_db = await connect_kusto(database, query_statement)
 
-            if dataframe.empty:
-                return "Query returned 0 results."
+        if isinstance(execute_query_kusto_db, str):
+            return execute_query_kusto_db  # Return the error message
 
-            chat_history.add_assistant_message(dataframe.to_json(orient="records"))
-            return dataframe  # Return the DataFrame for display
+        if execute_query_kusto_db.empty:
+            return "No data found for the given query."
 
-        except Exception as e:
-            return f"Error while executing query: {str(e)}"
+        chat_history.add_assistant_message(execute_query_kusto_db.to_json(orient="records"))
+        return execute_query_kusto_db  # Return the DataFrame for display
 
     chat_history.add_assistant_message(cleaned_output)
     return cleaned_output
+
+def clear_input() -> None:
+    """Clear the session state for chat messages and reset the application state."""
+    st.session_state.pop("messages", None)
+    st.session_state.pop("chat_history", None)
 
 # Instantiate Semantic Kernel and Plugin
 kernel, plugin = instantiate_kernel()
 
 # Retrieve Kusto Table Schema
-query_schema = asyncio.run(kusto_connect(
+query_schema = asyncio.run(connect_kusto(
     os.getenv('KUSTO_DATABASE_NAME'),
     f".show table {os.getenv('KUSTO_TABLE_NAME')} schema as json"
 ))
-schema = str(dataframe_from_result_table(query_schema).Schema[0])
-
-def clear_input():
-    """Clear the session state for chat messages and reset the application state."""
-    st.session_state.pop("question", None)
-    st.session_state.pop("messages", None)
-    st.session_state.pop("chat_history", None)
+schema = str(query_schema.Schema[0])
 
 # Configure Streamlit application
 with open('./frontend_config.yml', 'r') as file:
     config = yaml.safe_load(file)
-
 title = config['streamlit']['title']
 
 # Load sample questions from JSON file
@@ -118,7 +113,7 @@ question_list = [q for q in example_questions.values()]
 st.set_page_config(page_title=config['streamlit']['tab_title'], layout='wide')
 
 # Display logo and title
-st.image(config['streamlit']['logo'], width=400)
+st.image(config['streamlit']['logo'], width=800)
 st.title(title)
 
 # Initialize session state for messages if not already present
@@ -142,20 +137,15 @@ with st.sidebar:
     if st.button("Reset Chat"):
         clear_input()  # Clear session state and reinitialize
 
-# Initialize session state for messages if not already present
+# Display chat messages in the chat window
 if "messages" not in st.session_state:
     st.session_state.messages = [{"role": "assistant", "content": config['streamlit']['assistant_intro_message']}]
 
-# Ensure chat history is initialized as well
-if "chat_history" not in st.session_state:
-    st.session_state.chat_history = ChatHistory()
-
-# Display chat messages in the chat window
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         content = message["content"]
         if isinstance(content, pd.DataFrame):
-            st.dataframe(content.style.format(na_rep='NA'))  
+            st.dataframe(content.style.format(na_rep='NA'))
         else:
             st.markdown(f"**{message['role'].capitalize()}:** {content.strip()}")  # Enhanced formatting for readability
 
@@ -176,8 +166,8 @@ if last_msg["role"] != "assistant":
                 os.getenv('KUSTO_DATABASE_NAME'), os.getenv('KUSTO_TABLE_NAME'), schema,
                 st.session_state.chat_history  # Pass chat history to the agent
             ))
-    if isinstance(response, pd.DataFrame):
-        st.dataframe(response.style.format(na_rep='NA'))  # Ensure DataFrame is displayed correctly
-    else:
-        st.markdown(response.strip())  # Use markdown for other responses
+        if isinstance(response, pd.DataFrame):
+            st.dataframe(response.style.format(na_rep='NA'))  # Ensure DataFrame is displayed correctly
+        else:
+            st.markdown(response.strip())  # Use markdown for other responses
     st.session_state.messages.append({"role": "assistant", "content": response})
