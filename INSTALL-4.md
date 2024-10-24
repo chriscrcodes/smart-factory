@@ -25,10 +25,14 @@
     ```bash
     $ASSISTANT_APP_ID
     $ASSISTANT_APP_SECRET
-    $ASSISTANT_TENANT
+    $TENANT
     $AZURE_OPENAI_KEY
     ```
-- Retrieve the Fabric endpoint from [Fabric homepage](https://app.fabric.microsoft.com/home) > `Settings` > `Manage connections and gateways`
+- Select 'Real-Time Intelligence' from the [Fabric homepage](https://app.powerbi.com/home?experience=kusto).  
+![fabric-home](./artifacts/media/fabric-home.png "fabric-home")
+- Click on `Workspaces` > `Smart Factory`
+- Select the database `AIO` (type: `KQL Database`)
+- Retrieve the Fabric endpoint from `Overview` > `Query URI` > click `Copy URI`
 - `Connections` > copy the name of your Fabric endpoint (Connection type: `Azure Data Explorer (Kusto)`)
 - Modify environment variables in `.env` file
     ```bash
@@ -38,7 +42,7 @@
     AZURE_OPENAI_MODEL_NAME         = "gpt-4o"
     AZURE_OPENAI_DEPLOYMENT_VERSION = "2024-08-06"
 
-    AZURE_AD_TENANT_ID              = <$ASSISTANT_TENANT>
+    AZURE_AD_TENANT_ID              = <$TENANT>
     KUSTO_CLUSTER                   = <YOUR_MICROSOFT_FABRIC_ENDPOINT>
     KUSTO_MANAGED_IDENTITY_APP_ID   = <$ASSISTANT_APP_ID>
     KUSTO_MANAGED_IDENTITY_SECRET   = <$ASSISTANT_APP_SECRET>
@@ -69,4 +73,4 @@
 **Note**: **no data from the database is transmitted to the Large Language Model** in Azure Open AI, but only the prompt, and the model will return the appropriate query to execute.  
 - Some example queries are provided.
 
-    ![Factory Assistant User Interface](./artifacts/media/factory-assistant-ui.png "Factory Assistant User Interface")
+    ![Factory Assistant User Interface](./artifacts/media/demo-video.gif "Factory Assistant User Interface")

@@ -1,7 +1,7 @@
 {
-  "question1": "How many different products are we manufacturing? Please provide their names and the sites where they are produced.",
-  "question2": "Could you give me a list of operators, the sites they are associated with, and their current shifts?",
-  "question3": "If I need to contact Operator Tom at the Austin Site, what is his phone number and email address?",
-  "question4": "I would like to get the list of Cells, Sites, Areas, and their Maintenance Status and Maintenance Date.",
-  "question5": "I want to calculate the yield for each site this month, based on the total units produced and the good units produced. Display good units, total units and sort the results by yield percentage and site."
+  "question1": "What products are we manufacturing, and at which sites are they produced?",
+  "question2": "Calculate the yield for each site this month, based on the total units produced and the good units produced.",
+  "question3": "Can you give me a list of operators, the site they belong to and their current shift times?",  
+  "question4": "Si necesito ponerme en contacto con el operador Steve Harris en las instalaciones de Austin, ¿cuál es su número de teléfono y su dirección de correo electrónico?",  
+  "question5": "  能否提供单元格列表，包括 “区域”、“站点 ”维护日期和维护状态？"
 }

@@ -8,12 +8,14 @@
      export SUBSCRIPTION_ID="<YOUR_SUBSCRIPTION_ID>"
      export LOCATION="<YOUR_REGION>"
      export RESOURCE_GROUP="<YOUR_RESOURCE_GROUP>"
-     export KEYVAULT_NAME="<YOUR_KEYVAULT_NAME>"
+     export STORAGE_ACCOUNT_NAME="<YOUR_STORAGE_ACCOUNT_NAME>"
+     export SCHEMA_REGISTRY_NAME="<YOUR_SCHEMA_REGISTRY_NAME>"
+     export SCHEMA_REGISTRY_NAMESPACE="<YOUR_SCHEMA_REGISTRY_NAMESPACE>"
      export EVENTHUB_NAMESPACE="<YOUR_EVENTHUB_NAMESPACE>"
      export EVENTHUB_NAME="<YOUR_EVENTHUB_NAME>"
      export AZURE_OPENAI_NAME="<YOUR_AZURE_OPENAI_NAME>"
      ```
-     **Note(1)**: **keep a note of the environment variables for future use**.
+     > **NOTE(1)**: keep a note of the environment variables for future use.
    - Set Azure Subscription context:
      ```bash
      az account set --subscription $SUBSCRIPTION_ID
@@ -22,21 +24,24 @@
      ```bash
      SPN=$(az ad sp create-for-rbac --name AIO_SP_Contrib --role Contributor --scopes /subscriptions/$SUBSCRIPTION_ID)
      ```
-      **Note(2)**: create 3 variables with: `appId`, `password` and `tenant`, from the output of the command, and **keep a note of them for future use**.
+      > **NOTE(2)**: create 3 variables with: `appId`, `password` and `tenant`, from the output of the command, and **keep a note of them for future use**.
      ```bash
      export APP_ID=$(echo $SPN | jq -r .appId)
      export APP_SECRET=$(echo $SPN | jq -r .password)
      export TENANT=$(echo $SPN | jq -r .tenant)
      ```
+   - Assign role to the service principal `SPN`
+      ```bash
+      az role assignment create --assignee $APP_ID --role "Role Based Access Control Administrator" --scope subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP
+      ```
    - Create a service principal (service account) for the Factory Assistant:
      ```bash
      SPN2=$(az ad sp create-for-rbac --name GenAI_Factory_Assistant)
      ```
-      **Note(2)**: create 3 variables with: `appId`, `password` and `tenant`, from the output of the command, and **keep a note of them for future use**.
+      > **NOTE(2)**: create 2 variables with: `appId` and `password`, from the output of the command, and **keep a note of them for future use**.
      ```bash
      export ASSISTANT_APP_ID=$(echo $SPN2 | jq -r .appId)
      export ASSISTANT_APP_SECRET=$(echo $SPN2 | jq -r .password)
-     export ASSISTANT_TENANT=$(echo $SPN2 | jq -r .tenant)
      ```
    - Get `objectId` of `Microsoft Entra ID` application and create 1 variable:
      ```bash
@@ -44,20 +49,27 @@
      ```
    - Register required Resource Providers (execute this step only once per subscription):
      ```bash
-     az provider register --namespace "Microsoft.ExtendedLocation"
-     az provider register --namespace "Microsoft.Kubernetes"
-     az provider register --namespace "Microsoft.KubernetesConfiguration"
-     az provider register --namespace "Microsoft.IoTOperationsOrchestrator"
-     az provider register --namespace "Microsoft.IoTOperations"
-     az provider register --namespace "Microsoft.DeviceRegistry"
+      az provider register -n "Microsoft.ExtendedLocation"
+      az provider register -n "Microsoft.Kubernetes"
+      az provider register -n "Microsoft.KubernetesConfiguration"
+      az provider register -n "Microsoft.IoTOperations"
+      az provider register -n "Microsoft.DeviceRegistry"
      ```
    - Create a Resource Group:
      ```bash
      az group create --location $LOCATION --resource-group $RESOURCE_GROUP --subscription $SUBSCRIPTION_ID
      ```
-   - Create an Azure Key Vault:
+   - Create a storage account with `hierarchical namespace enabled`:
      ```bash
-     az keyvault create --enable-rbac-authorization false --name $KEYVAULT_NAME --resource-group $RESOURCE_GROUP
+     az storage account create --name $STORAGE_ACCOUNT_NAME --resource-group $RESOURCE_GROUP --enable-hierarchical-namespace
+     ```
+   - Install `Azure IoT Operations extension`:
+      ```bash
+      az extension add --allow-preview true --name azure-iot-ops --version 0.7.0b2
+      ```
+   - Create a schema registry that connects to your storage account:
+     ```bash
+     az iot ops schema registry create --name $SCHEMA_REGISTRY_NAME --resource-group $RESOURCE_GROUP --registry-namespace $SCHEMA_REGISTRY_NAMESPACE --sa-resource-id $(az storage account show --name $STORAGE_ACCOUNT_NAME --resource-group $RESOURCE_GROUP -o tsv --query id)
      ```
    - Create an Event Hub name space:
      ```bash
@@ -97,7 +109,7 @@
       [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fchriscrcodes%2Fsmart-factory%2Frefs%2Fheads%2Fmain%2Fartifacts%2Ftemplates%2Fvm%2Fazuredeploy.json)
       - `Review + create` > `Create`
 
-      **Note**: `Standard_D4s_v3` is the recommended size for the Azure VM.
+      > **Note**: `Standard_D4s_v3` is the recommended size for the Azure VM.
 
 - Option B (your own Industrial PC or Virtual Machine)
   - Install `Linux Ubuntu 22.04`
@@ -133,10 +145,16 @@
      echo fs.file-max = 100000 | sudo tee -a /etc/sysctl.conf
      sudo sysctl -p
      ```
-- Check k3s installation
+- Check K3s installation
   ```bash
   kubectl get node
   ```
+- Install k9s
+    ```bash
+    sudo snap install k9s
+    alias k9s=/snap/k9s/current/bin/k9s
+    echo "alias k9s=/snap/k9s/current/bin/k9s" >> ~/.bashrc
+    ```
 - Install Azure prerequisites
   - Install `Azure CLI`:
     ```bash
@@ -146,9 +164,9 @@
     ```bash
     az extension add --allow-preview true --name connectedk8s
     ```
-  - Install `Azure IoT Operations extension` (v0.5.1b1, to be able to use the Data Processor component):
+  - Install `Azure IoT Operations extension`:
     ```bash
-    az extension add --allow-preview true --name azure-iot-ops --version 0.5.1b1
+    az extension add --allow-preview true --name azure-iot-ops --version 0.7.0b2
     ```
 
 - Prepare your Cluster for Azure IoT Operations
@@ -163,11 +181,12 @@
 
 - Validate Azure IoT Operations pre-deployment checks  
     - Before the deployment, use `az iot ops check` to execute IoT Operations pre-deployment checks.  
-    **Don't look at the post deployment checks this time.**
-      ```bash
-      az iot ops check
-      ```
+    > **Note**: Don't look at the post deployment checks this time.  
 
-      ![az-iot-ops-check-pre](./artifacts/media/az-iot-ops-check-pre.png "az-iot-ops-check-pre")
+    ```bash
+    az iot ops check
+    ```
+
+    ![az-iot-ops-check-pre](./artifacts/media/az-iot-ops-check-pre.png "az-iot-ops-check-pre")
       
 - ✅ **You can now continue to** > [Part 2 - Connect your Edge platform to Cloud platform](./INSTALL-2.md)
