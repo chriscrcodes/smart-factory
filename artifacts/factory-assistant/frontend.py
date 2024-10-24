@@ -126,7 +126,7 @@ if "chat_history" not in st.session_state:
 
 # Sidebar for displaying example questions and reset button
 with st.sidebar:
-    st.header("Example Questions:")
+    st.header("FAQ")
     for question in question_list:
         with st.expander(label=question, expanded=False):
             if st.button("Ask", key=question):  # Unique key for each button

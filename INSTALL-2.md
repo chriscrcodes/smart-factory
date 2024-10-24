@@ -27,32 +27,12 @@
      ```
    - Connect Kubernetes Cluster to Azure:
      ```bash
-     az connectedk8s connect --name $CLUSTER_NAME --location $LOCATION --resource-group $RESOURCE_GROUP --subscription $SUBSCRIPTION_ID --enable-oidc-issuer --enable-workload-identity
+     az connectedk8s connect --name $CLUSTER_NAME --location $LOCATION --resource-group $RESOURCE_GROUP --subscription $SUBSCRIPTION_ID
      ```
-   - Get the cluster's issuer URL
-      ```bash
-      az connectedk8s show --resource-group $RESOURCE_GROUP --name $CLUSTER_NAME --query oidcIssuerProfile.issuerUrl --output tsv
-      ```  
-      Save the output of this command to use in the next steps.
-   - Create a K3s configuration file
-      ```bash
-      sudo nano /etc/rancher/k3s/config.yaml
-      ```
-   - Add the following content to the config.yaml file, replacing the <SERVICE_ACCOUNT_ISSUER> placeholder with your cluster's issuer URL.
-      ```bash
-      kube-apiserver-arg:
-        - service-account-issuer=<SERVICE_ACCOUNT_ISSUER>
-        - service-account-max-token-expiration=24h
-      ```
-   - Save the file and exit the text editor
    - Enable Custom Location support:
      ```bash
      az connectedk8s enable-features --name $CLUSTER_NAME --resource-group $RESOURCE_GROUP --custom-locations-oid $OBJECT_ID --features cluster-connect custom-locations
      ```
-   - Restart K3s
-      ```bash
-      sudo systemctl restart k3s
-      ```
 
 #### Deploy and configure Azure IoT Operations
 
@@ -68,7 +48,8 @@
 
 - Confirm Azure IoT Operations installation  
     - After the deployment is complete, use `az iot ops check` to evaluate IoT Operations service deployment for health, configuration, and usability. The check command can help you find problems in your deployment and configuration.  
-    **Confirm post deployment checks are green.**
+      > **Note**: confirm post deployment checks are green.   
+      
       ```bash
       az iot ops check
       ```
@@ -76,24 +57,30 @@
       ![az-iot-ops-check-post](./artifacts/media/az-iot-ops-check-post.png "az-iot-ops-check-post")
 
 - Azure IoT Operations - Create Data flows
-    - Download the Distributed State Store tool
-    ```bash
-    curl -O https://raw.githubusercontent.com/chriscrcodes/smart-factory/main/artifacts/templates/azure-iot-operations/dataflows/dss/dss_set
-    ``` 
+    - Download the [Distributed State Store](https://learn.microsoft.com/en-us/azure/iot-operations/create-edge-apps/concept-about-state-store-protocol) tool
+      ```bash
+      curl -O https://raw.githubusercontent.com/chriscrcodes/smart-factory/main/artifacts/templates/azure-iot-operations/dataflows/dss/dss_set
+      ``` 
     - Set the file as executable
-    ```bash
-    chmod +x ./dss_set
-    ```
+      ```bash
+      chmod +x ./dss_set
+      ```
     - Download the Operators Dataset
-    ```bash
-    curl -O https://raw.githubusercontent.com/chriscrcodes/smart-factory/main/artifacts/templates/azure-iot-operations/dataflows/dss/operators.json
-    ``` 
+      ```bash
+      curl -O https://raw.githubusercontent.com/chriscrcodes/smart-factory/main/artifacts/templates/azure-iot-operations/dataflows/dss/operators.json
+      ``` 
     - Download the Products Dataset
-    ```bash
-    curl -O https://raw.githubusercontent.com/chriscrcodes/smart-factory/main/artifacts/templates/azure-iot-operations/dataflows/dss/products.json
-    ``` 
-    - ./dss_set --key operators --file "operators.json" --address localhost
-    - ./dss_set --key products --file "products.json" --address localhost
+      ```bash
+      curl -O https://raw.githubusercontent.com/chriscrcodes/smart-factory/main/artifacts/templates/azure-iot-operations/dataflows/dss/products.json
+      ``` 
+    - Import the operators dataset in the Distributed State Store
+      ```bash
+      ./dss_set --key operators --file "operators.json" --address localhost
+      ```
+    - Import the products dataset in the Distributed State Store
+      ```bash
+      ./dss_set --key operators --file "products.json" --address localhost
+      ```
 
 #### Deploy Factory Simulator
 
@@ -107,40 +94,10 @@
   ```bash
   kubectl apply -f https://raw.githubusercontent.com/chriscrcodes/smart-factory/main/artifacts/templates/azure-iot-operations/dataflows/bronze-to-silver.yaml
   ```
-- MQTT Client
-  ```bash
-  kubectl apply -f https://raw.githubusercontent.com/chriscrcodes/smart-factory/main/artifacts/templates/k3s/pods/mqtt-client/pod.yaml
-  ```
-
-#### Confirm factory simulator is running
-
-  - Connect to the container running the MQTT client
-    ```bash
-    kubectl exec --stdin --tty mqtt-client -n azure-iot-operations -- sh
-    ```
-  - From within the container, launch the MQTT client:
-    ```bash
-    mqttui --broker mqtts://aio-mq-dmqtt-frontend:8883 --username '$sat' --password $(cat /var/run/secrets/tokens/mq-sat) --insecure
-    ```
-  - Confirm if the 2 following topics are present:
-    - `LightningCars` (data coming from the Factory Simulator)
-    - `Silver` (data coming from Azure IoT Operations Data Flows)  
-    ![MQTT Broker Client](./artifacts/media/mqttui.png "MQTT Broker Client")
-  - If the topics aren't shown, restart the Factory Simulator container:
-    - Exit the MQTT client interface (type q)
-    - Exit the MQTT client container (type exit and press Enter)
-    - Identify the name of the Factory Simulator container:
-      ```bash
-      kubectl get pods -n azure-iot-operations
-      ```
-    - Restart the container
-      ```bash
-      kubectl delete pod -n azure-iot-operations iiot-simulator-factory-<suffix>
-      ```
 
 #### Deploy Cloud connector
 
-  - Download the data flow
+  - Download the data flow  
     ```bash
     curl -O https://raw.githubusercontent.com/chriscrcodes/smart-factory/main/artifacts/templates/azure-iot-operations/dataflows/bronze-to-silver.yaml
     ```

@@ -11,7 +11,7 @@
 ### Key features and benefits
 
 - **Data Processing**: Data structure following a **Medallion Architecture**, with the goal of incrementally and progressively improving the structure and quality of data as it flows through each layer of the architecture.  
-From `Bronze` (Edge/Simulator) ⇒ `Silver` (Edge/Azure IoT Operations Data Processor) ⇒ `Gold` (Cloud/Fabric) layer tables.
+From `Bronze` (Edge: MQTT Data Simulator) ⇒ `Silver` (Edge: Azure IoT Operations) ⇒ `Gold` (Cloud: Microsoft Fabric) layer tables.
 
 - **Natural Language Processing (NLP)**: a Smart Assistant, enhanced by Generative AI, empowers operators, so they can ask complex questions about machine operations, staff, production quality, as if they were speaking to a human expert in the Factory.
 
@@ -60,20 +60,29 @@ From `Bronze` (Edge/Simulator) ⇒ `Silver` (Edge/Azure IoT Operations Data Proc
 
 1. **Prompt**: _"I want to calculate the yield for each site this month, based on the total units produced and the good units produced. Display good units, total units and sort the results by yield percentage and site."_
 2. **Generative AI Model**: analyzes the prompt and generate the corresponding query to be executed to the database.  
-**No data from the database is transmitted to the Large Language Model, only the prompt and the schema of the database.**  
+
+    > **IMPORTANT**: No actual data from the database is transmitted to the Large Language Model; only the prompt and the database schema are shared. The LLM will generate the query to be executed against the database, but it won't execute the query itself.  
+
     Example query generated in `KQL (Kusto Query Language)`:  
     ```
     aio_gold
     | where Timestamp >= startofmonth(now())
-    | summarize TotalUnitsProduced = sum(TotalPartsCount), TotalGoodUnits = sum(GoodPartsCount) by Site
-    | extend Yield = TotalGoodUnits / TotalUnitsProduced * 100
-    | limit 100
+    | summarize GoodUnits = sum(GoodPartsCount), TotalUnits = sum(TotalPartsCount) by Site
+    | extend YieldPercentage = (GoodUnits / TotalUnits) * 100
+    | project Site, GoodUnits, TotalUnits, YieldPercentage
+    | order by YieldPercentage desc, Site
+    | top 100 by YieldPercentage desc
     ```  
 
-3. **`Backend application (Python)`**: queries the database to retrieve results.  
-    **`Frontend application (Streamlit)`**: provides the user interface.
+3. **Back-end application `(Python)`**: queries the database to retrieve results.  
+
+4. **Front-end application `(Streamlit)`**: provides the user interface.
 
 ## Prerequisites
+Microsoft Documentation: [Azure IoT Operations prerequisites](https://learn.microsoft.com/en-us/azure/iot-operations/deploy-iot-ops/howto-prepare-cluster?tabs=ubuntu)
+
+> **WARNING**: Azure IoT Operations is currently in preview.  
+You shouldn't use this preview software in production environments.
 
 ### Hardware requirements
 
@@ -97,7 +106,7 @@ From `Bronze` (Edge/Simulator) ⇒ `Silver` (Edge/Azure IoT Operations Data Proc
 
  - Azure Subscription (with Contributor rights)
     - Resource Group
-    - Key Vault
+    - Storage Account
     - Event Hub
     - Azure Open AI Service
     - _Optional_: Virtual Machine (if you want to test everything in Azure Cloud)
@@ -105,7 +114,7 @@ From `Bronze` (Edge/Simulator) ⇒ `Silver` (Edge/Azure IoT Operations Data Proc
 
 ## Demo
 
-![Factory Assistant User Interface](./artifacts/media/factory-assistant-ui.png "Factory Assistant User Interface")
+![Factory Assistant User Interface](./artifacts/media/demo-video.gif "Factory Assistant User Interface")
 
 ## Solution build steps
 

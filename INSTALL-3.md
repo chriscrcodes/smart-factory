@@ -110,11 +110,11 @@
    - Retrieve the environment following variables you defined in [Part 1 - Provision resources (Edge and Cloud)](./INSTALL-1.md) ==> **Note(2)**:
      ```bash
      $ASSISTANT_APP_ID
-     $ASSISTANT_TENANT
+     $TENANT
      ```
 - Add the following query:
     ```
-    .add database AIO viewers ('aadapp=<ASSISTANT_APP_ID>;<ASSISTANT_TENANT>') "Gen AI Factory Assistant"
+    .add database AIO viewers ('aadapp=<ASSISTANT_APP_ID>;<TENANT>') "Gen AI Factory Assistant"
     ```
 - Select the query portion and click `Run`
 
@@ -122,11 +122,11 @@
    - Retrieve the environment following variables you defined in [Part 1 - Provision resources (Edge and Cloud)](./INSTALL-1.md) ==> **Note(2)**:
      ```bash
      $ASSISTANT_APP_ID
-     $ASSISTANT_TENANT
+     $TENANT
      ```
 - Add the following query:
     ```
-    .add table aio_gold admins ('aadapp=<ASSISTANT_APP_ID>;<ASSISTANT_TENANT>') "Gen AI Factory Assistant"
+    .add table aio_gold admins ('aadapp=<ASSISTANT_APP_ID>;<TENANT>') "Gen AI Factory Assistant"
     ```
 - Select the query portion and click `Run`
 
@@ -167,6 +167,8 @@
     - Connect `Managefields1` to `KQLDatabase1`
     - Connect `aio_silver` to `Managefields1`
     - Click `Add all fields`
+    - Set the field `Timestamp` to `DateTime`  
+     ![fabric-eventstream-1-1](./artifacts/media/fabric_eventstream-1-1.png "fabric-eventstream-1-1")
     - Go to the end of the list of fields and remove the 3 following fields:
         - `EventProcessedUtcTime`
         - `PartitionId`
