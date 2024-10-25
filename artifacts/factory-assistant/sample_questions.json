@@ -1,7 +1,7 @@
 {
-  "question1": "What products are we manufacturing, and at which sites are they produced?",
-  "question2": "Calculate the yield for each site this month, based on the total units produced and the good units produced.",
-  "question3": "Can you give me a list of operators, the site they belong to and their current shift times?",  
+  "question1": "What products are we manufacturing, and at which Sites are they produced?",
+  "question2": "Determine the yield percentage for each Site this month by comparing the total units produced to the number of good units produced.",
+  "question3": "Provide a list of operators, their respective sites, and their current shift schedules.",  
   "question4": "Si necesito ponerme en contacto con el operador Steve Harris en las instalaciones de Austin, ¿cuál es su número de teléfono y su dirección de correo electrónico?",  
-  "question5": "  能否提供单元格列表，包括 “区域”、“站点 ”维护日期和维护状态？"
+  "question5": "能否提供单元格列表，包括 “区域”、“站点 ”维护日期和维护状态？"
 }
