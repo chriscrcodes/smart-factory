@@ -58,7 +58,7 @@ From `Bronze` (Edge: MQTT Data Simulator) ⇒ `Silver` (Edge: Azure IoT Operatio
 #### Creating complex queries from natural language prompt - Example
 ![Factory Assistant Prompt](./artifacts/media/factory-assistant-prompt.png "Factory Assistant Prompt")
 
-1. **Prompt**: _"I want to calculate the yield for each site this month, based on the total units produced and the good units produced. Display good units, total units and sort the results by yield percentage and site."_
+1. **Prompt**: _"Determine the yield percentage for each Site this month by comparing the total units produced to the number of good units produced."_
 2. **Generative AI Model**: analyzes the prompt and generate the corresponding query to be executed to the database.  
 
     > **IMPORTANT**: No actual data from the database is transmitted to the Large Language Model; only the prompt and the database schema are shared. The LLM will generate the query to be executed against the database, but it won't execute the query itself.  
@@ -67,11 +67,10 @@ From `Bronze` (Edge: MQTT Data Simulator) ⇒ `Silver` (Edge: Azure IoT Operatio
     ```
     aio_gold
     | where Timestamp >= startofmonth(now())
-    | summarize GoodUnits = sum(GoodPartsCount), TotalUnits = sum(TotalPartsCount) by Site
-    | extend YieldPercentage = (GoodUnits / TotalUnits) * 100
-    | project Site, GoodUnits, TotalUnits, YieldPercentage
-    | order by YieldPercentage desc, Site
-    | top 100 by YieldPercentage desc
+    | summarize TotalUnitsProduced = sum(TotalPartsCount), GoodUnitsProduced = sum(GoodPartsCount) by Site
+    | extend YieldPercentage = (GoodUnitsProduced / TotalUnitsProduced) * 100
+    | project Site, YieldPercentage
+    | limit 100
     ```  
 
 3. **Back-end application `(Python)`**: queries the database to retrieve results.  
