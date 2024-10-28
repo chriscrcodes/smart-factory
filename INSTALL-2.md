@@ -119,21 +119,21 @@
 
   - Download the data flow  
     ```bash
-    curl -O https://raw.githubusercontent.com/chriscrcodes/smart-factory/main/artifacts/templates/azure-iot-operations/dataflows/bronze-to-silver.yaml
+    curl -O https://raw.githubusercontent.com/chriscrcodes/smart-factory/main/artifacts/templates/azure-iot-operations/dataflows/silver-to-cloud.yaml
     ```
   - Modify file with the name of the event hub name space created in [Step 1](#step-1---provision-azure-resources) (`$EVENTHUB_NAMESPACE` variable):
     - ```bash
-      sed -i 's/<EVENTHUB_NAMESPACE>/'"${EVENTHUB_NAMESPACE}"'/' bronze-to-silver.yaml
+      sed -i 's/<EVENTHUB_NAMESPACE>/'"${EVENTHUB_NAMESPACE}"'/' silver-to-cloud.yaml
       ```
 
   - Modify file with the name of the event hub name created in [Step 1](#step-1---provision-azure-resources) (`$EVENTHUB` variable):
     - ```bash
-      sed -i 's/<EVENTHUB>/'"${EVENTHUB}"'/' bronze-to-silver.yaml
+      sed -i 's/<EVENTHUB>/'"${EVENTHUB}"'/' silver-to-cloud.yaml
       ```
 
   - Deploy the cloud connector
     - ```bash
-      kubectl apply -f bronze-to-silver.yaml
+      kubectl apply -f silver-to-cloud.yaml
       ```
 
   - Authorize the cluster to connect to the event hub
