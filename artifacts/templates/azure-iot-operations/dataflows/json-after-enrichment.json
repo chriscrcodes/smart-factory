@@ -1,0 +1,23 @@
+{
+  "Area": "Inspection",
+  "Cell": "DR2FB3",
+  "Downtime": 13.18,
+  "EmployeeId": "90159413",
+  "EnergyConsumption": 10.86,
+  "Enterprise": "LightningCars",
+  "GoodPartsCount": 1150,
+  "IdealCycleTime": 38.0,
+  "Latitude": 31.2304,
+  "Line": "Line1",
+  "Longitude": 121.4737,
+  "OperatingTime": 68000,
+  "PlannedProductionTime": 72000,
+  "ProductId": 95216290,
+  "Shift": 14,
+  "ShiftHours": "08:00-16:00",
+  "Site": "Shanghai",
+  "Temperature": 87.13,
+  "Timestamp": "2024-10-28T13:03:04.952031+00:00",
+  "TotalPartsCount": 1200,
+  "UNS": "LightningCars/Shanghai/Inspection/Line1/DR2FB3"
+}

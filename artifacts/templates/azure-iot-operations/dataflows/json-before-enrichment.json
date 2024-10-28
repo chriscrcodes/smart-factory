@@ -1,0 +1,20 @@
+{
+    "Latitude": 31.2304,
+    "Longitude": 121.4737,
+    "PlannedProductionTime": 72000,
+    "OperatingTime": 68000,
+    "TotalPartsCount": 1200,
+    "GoodPartsCount": 1150,
+    "IdealCycleTime": 38,
+    "EnergyConsumption": 10.86,
+    "Temperature": 87.13,
+    "Shift": 14,
+    "Downtime": 13.18,
+    "Timestamp": "2024-10-28T13:03:04.952031+00:00",
+    "UNS": "LightningCars/Shanghai/Inspection/Line1/DR2FB3",
+    "Enterprise": "LightningCars",
+    "Site": "Shanghai",
+    "Area": "Inspection",
+    "Line": "Line1",
+    "Cell": "DR2FB3"
+}
