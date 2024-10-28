@@ -95,6 +95,26 @@
   kubectl apply -f https://raw.githubusercontent.com/chriscrcodes/smart-factory/main/artifacts/templates/azure-iot-operations/dataflows/bronze-to-silver.yaml
   ```
 
+#### Confirm factory simulator is running
+  - Deploy MQTT Client
+    ```bash
+    kubectl apply -f https://raw.githubusercontent.com/chriscrcodes/smart-factory/main/artifacts/templates/k3s/pods/mqtt-client/pod.yaml
+    ```
+
+  - Connect to the container running the MQTT client
+    ```bash
+    kubectl exec --stdin --tty mqtt-client -n azure-iot-operations -- sh
+    ```
+  - From within the container, launch the MQTT client:
+    ```bash
+    mqttui --broker mqtt://aio-broker-insecure:1883 --insecure
+    ```
+  - Confirm if the 2 following topics are present:
+    - `LightningCars` (data coming from the Factory Simulator)
+    - `Silver` (data coming from Azure IoT Operations Data flows)  
+
+    ![MQTT Broker Client](./artifacts/media/mqttui.png "MQTT Broker Client")
+
 #### Deploy Cloud connector
 
   - Download the data flow  
