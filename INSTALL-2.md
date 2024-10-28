@@ -79,7 +79,7 @@
       ```
     - Import the products dataset in the Distributed State Store
       ```bash
-      ./dss_set --key operators --file "products.json" --address localhost
+      ./dss_set --key products --file "products.json" --address localhost
       ```
 
 #### Deploy Factory Simulator
