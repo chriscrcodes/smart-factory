@@ -11,6 +11,7 @@ data:
           "port": 1883
       },
       "root_topic": "LightningCars",
+      "publish_interval": 1,
       "topics": [
         {
             "topics": [
