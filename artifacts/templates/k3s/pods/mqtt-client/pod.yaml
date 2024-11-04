@@ -4,7 +4,6 @@ metadata:
   name: mqtt-client
   namespace: azure-iot-operations
 spec:
-  serviceAccountName: mqtt-client
   containers:
   - image: alpine
     name: mqtt-client

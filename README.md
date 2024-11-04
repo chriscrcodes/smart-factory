@@ -6,8 +6,6 @@
 🔍 Real-time ingestion and processing of operations data (OT): operators, manufactured products, and machine maintenance schedules.  
 🗣️ Data processing: Edge and Cloud, with a Semantic Kernel to power the Factory Assistant, for smarter interactions.  
 
-[Video on the IoT Show](https://youtu.be/-AxWwJU_G_U?feature=shared) (demo starts at [19:54](https://youtu.be/-AxWwJU_G_U?feature=shared&t=1194)).
-
 ### Key features and benefits
 
 - **Data Processing**: Data structure following a **Medallion Architecture**, with the goal of incrementally and progressively improving the structure and quality of data as it flows through each layer of the architecture.  
@@ -29,21 +27,25 @@ From `Bronze` (Edge: MQTT Data Simulator) ⇒ `Silver` (Edge: Azure IoT Operatio
 
 ![Data Diagram](./artifacts/media/key-components.png "Data Diagram")
 
-1. **Factory Simulator**  
+1. [**Factory Simulator**](./artifacts/mqtt-data-simulator/README.md)  
     Simulates data coming from several factories: Berlin, Austin, Buffalo, Shanghai.  
     Factory simulator is publishing data to an Message Queuing Telemetry Transport (MQTT) broker topic based on the international standard from the International Society of Automation known as 'ISA-95' with the following format: Enterprise/Site/Area/Line/Cell.  
     Industrial machines involved in the process are 'Cells.'  
 
-2. **Azure IoT Operations**  
+    > Messages are published following the **UNS (Unified Name Space) Architecture**.  
+    The UNS is a method of organizing and structuring data in a way that makes it accessible and meaningful across an entire enterprise.  
+    ![UNS](./artifacts/media/UNS.png "UNS")
+
+2. [**Azure IoT Operations**](https://learn.microsoft.com/en-us/azure/iot-operations/overview-iot-operations)  
     Processes data at Edge: normalize, contextualize, enrich with Edge reference datasets (Operators and Products).
 
-3. **Azure Event Hub**  
+3. [**Azure Event Hub**](https://learn.microsoft.com/en-us/azure/event-hubs/event-hubs-about)  
     Data ingestion in Azure.     
     
-4. **Microsoft Fabric**  
+4. [**Microsoft Fabric Real-Time Intelligence**](https://learn.microsoft.com/en-us/fabric/real-time-intelligence/overview)  
     Processes data in Azure: materialize data as a Table, enrich with Cloud reference datasets (Operators, Assets and Products).
 
-5. **Generative AI Factory Assistant**  
+5. [**Generative AI Factory Assistant**](https://learn.microsoft.com/en-us/azure/ai-services/openai/overview)  
     Introducing a custom Large Language Model (LLM) Factory Assistant, based on OpenAI model 'GPT-4o', that enables natural language communication with the factory. This assistant simplifies the process of retrieving information from various systems and databases.
 
 ### Communication flow
@@ -51,9 +53,9 @@ From `Bronze` (Edge: MQTT Data Simulator) ⇒ `Silver` (Edge: Azure IoT Operatio
 ![Factory Assistant Communication Flow](./artifacts/media/factory-assistant-communication-flow.png "Factory Assistant Communication Flow")
 
 1. **User Prompt**: user asks a question to the Factory Assistant.  
-    The graphical user interface is based on the open-source framework `Streamlit`.
+    The graphical user interface is based on the open-source framework [`Streamlit`](https://streamlit.io/).
 2. **Custom Large Language Model (LLM)**: analyzes the prompt and generate the corresponding query to be executed to the database in Microsoft Fabric.  
-3. **Semantic Kernel**: execute query and return results (Python application).
+3. [**Semantic Kernel**](https://aka.ms/semantic-kernel): execute query and return results (Python application).
 
 #### Creating complex queries from natural language prompt - Example
 ![Factory Assistant Prompt](./artifacts/media/factory-assistant-prompt.png "Factory Assistant Prompt")
@@ -114,6 +116,10 @@ You shouldn't use this preview software in production environments.
 ## Demo
 
 ![Factory Assistant User Interface](./artifacts/media/demo-video.gif "Factory Assistant User Interface")
+
+## Videos
+
+[![Video on the IoT Show](https://img.youtube.com/vi/-AxWwJU_G_U/hqdefault.jpg)](https://www.youtube.com/embed/-AxWwJU_G_U)
 
 ## Solution build steps
 

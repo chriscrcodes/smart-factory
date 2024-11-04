@@ -1,34 +1,18 @@
 apiVersion: connectivity.iotoperations.azure.com/v1beta1
-kind: DataflowEndpoint
-metadata:
-  name: mqtt-source
-  namespace: azure-iot-operations
-spec:
-  endpointType: Mqtt
-  mqttSettings:
-    host: "aio-broker:18883"
-    tls:
-      mode: Enabled
-      trustedCaCertificateConfigMapRef: azure-iot-operations-aio-ca-trust-bundle
-    authentication:
-      method: ServiceAccountToken
-      serviceAccountTokenSettings:
-        audience: aio-internal
----
-apiVersion: connectivity.iotoperations.azure.com/v1beta1
 kind: Dataflow
 metadata:
   name: bronze-to-silver
   namespace: azure-iot-operations
 spec:
-  profileRef: silver-dataflow
+  profileRef: default
+  mode: Enabled
   operations:
-    - operationType: source
+    - operationType: Source
       sourceSettings:
-        endpointRef: mqtt-source
+        endpointRef: default
         dataSources:
         - LightningCars/# # <TOPIC>
-    - operationType: builtInTransformation
+    - operationType: BuiltInTransformation
       builtInTransformationSettings:
         map:
           - inputs:
@@ -54,18 +38,7 @@ spec:
              - '$source.Shift'              # - $1
              - '$context(operators).Shift'  # - $2
            expression: '$1 == $2'
-    - operationType: destination
+    - operationType: Destination
       destinationSettings:
-        endpointRef: mqtt-source
+        endpointRef: default
         dataDestination: Silver
----
-apiVersion: connectivity.iotoperations.azure.com/v1beta1
-kind: DataflowProfile
-metadata:
-  name: silver-dataflow
-  namespace: azure-iot-operations
-spec:
-  instanceCount: 1
-  diagnostics:
-    logs:
-      level: "debug"

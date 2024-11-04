@@ -30,10 +30,6 @@
      export APP_SECRET=$(echo $SPN | jq -r .password)
      export TENANT=$(echo $SPN | jq -r .tenant)
      ```
-   - Assign role to the service principal `SPN`
-      ```bash
-      az role assignment create --assignee $APP_ID --role "Role Based Access Control Administrator" --scope subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP
-      ```
    - Create a service principal (service account) for the Factory Assistant:
      ```bash
      SPN2=$(az ad sp create-for-rbac --name GenAI_Factory_Assistant)
@@ -54,18 +50,23 @@
       az provider register -n "Microsoft.KubernetesConfiguration"
       az provider register -n "Microsoft.IoTOperations"
       az provider register -n "Microsoft.DeviceRegistry"
+      az provider register -n "Microsoft.SecretSyncController"
      ```
    - Create a Resource Group:
      ```bash
      az group create --location $LOCATION --resource-group $RESOURCE_GROUP --subscription $SUBSCRIPTION_ID
      ```
+   - Assign role to the service principal `SPN`
+      ```bash
+      az role assignment create --assignee $APP_ID --role "Role Based Access Control Administrator" --scope subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP
+      ```
    - Create a storage account with `hierarchical namespace enabled`:
      ```bash
      az storage account create --name $STORAGE_ACCOUNT_NAME --resource-group $RESOURCE_GROUP --enable-hierarchical-namespace
      ```
    - Install `Azure IoT Operations extension`:
       ```bash
-      az extension add --allow-preview true --name azure-iot-ops --version 0.7.0b2
+      az extension add --allow-preview true --name azure-iot-ops --version 0.8.0b1
       ```
    - Create a schema registry that connects to your storage account:
      ```bash
@@ -155,6 +156,7 @@
     alias k9s=/snap/k9s/current/bin/k9s
     echo "alias k9s=/snap/k9s/current/bin/k9s" >> ~/.bashrc
     ```
+    > Note: you can browse pods using the following command: k9s -n azure-iot-operations
 - Install Azure prerequisites
   - Install `Azure CLI`:
     ```bash
@@ -162,11 +164,11 @@
     ```
   - Install `Azure arc extension`:
     ```bash
-    az extension add --allow-preview true --name connectedk8s
+    az extension add --allow-preview true --name connectedk8s --version 1.10.1
     ```
   - Install `Azure IoT Operations extension`:
     ```bash
-    az extension add --allow-preview true --name azure-iot-ops --version 0.7.0b2
+    az extension add --allow-preview true --name azure-iot-ops --version 0.8.0b1
     ```
 
 - Prepare your Cluster for Azure IoT Operations
@@ -181,7 +183,6 @@
 
 - Validate Azure IoT Operations pre-deployment checks  
     - Before the deployment, use `az iot ops check` to execute IoT Operations pre-deployment checks.  
-    > **Note**: Don't look at the post deployment checks this time.  
 
     ```bash
     az iot ops check
