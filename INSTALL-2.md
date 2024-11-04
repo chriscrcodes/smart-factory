@@ -27,23 +27,42 @@
      ```
    - Connect Kubernetes Cluster to Azure:
      ```bash
-     az connectedk8s connect --name $CLUSTER_NAME --location $LOCATION --resource-group $RESOURCE_GROUP --subscription $SUBSCRIPTION_ID
+     az connectedk8s connect --name $CLUSTER_NAME --location $LOCATION --resource-group $RESOURCE_GROUP --subscription $SUBSCRIPTION_ID --enable-oidc-issuer --enable-workload-identity
      ```
+   - Get the cluster's issuer URL:
+      ```bash
+     az connectedk8s show --resource-group $RESOURCE_GROUP --name $CLUSTER_NAME --query oidcIssuerProfile.issuerUrl --output tsv
+     ```
+     Save the output of this command to use in the next steps.
+   - Create a k3s configuration file:
+      ```bash
+      sudo nano /etc/rancher/k3s/config.yaml
+      ```
+   - Add the following content to the config.yaml file, replacing the <SERVICE_ACCOUNT_ISSUER> placeholder with your cluster's issuer URL.
+      ```yaml
+      kube-apiserver-arg:
+      - service-account-issuer=<SERVICE_ACCOUNT_ISSUER>
+      - service-account-max-token-expiration=24h
+      ```
    - Enable Custom Location support:
      ```bash
      az connectedk8s enable-features --name $CLUSTER_NAME --resource-group $RESOURCE_GROUP --custom-locations-oid $OBJECT_ID --features cluster-connect custom-locations
      ```
+   - Restart K3s:
+      ```bash
+      sudo systemctl restart k3s
+      ```
 
 #### Deploy and configure Azure IoT Operations
 
 - Deploy Azure IoT Operations
    - Prepare your cluster with the dependencies that Azure IoT Operations requires:
      ```bash
-     az iot ops init --cluster $CLUSTER_NAME --resource-group $RESOURCE_GROUP --sr-resource-id /subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.DeviceRegistry/schemaRegistries/$SCHEMA_REGISTRY_NAME
+     az iot ops init --subscription $SUBSCRIPTION_ID --cluster $CLUSTER_NAME --resource-group $RESOURCE_GROUP
      ```
    - Deploy Azure IoT Operations:
       ```bash
-      az iot ops create --add-insecure-listener --name $CLUSTER_NAME-ops-instance --cluster $CLUSTER_NAME --resource-group $RESOURCE_GROUP
+      az iot ops create --add-insecure-listener --kubernetes-distro K3s --name $CLUSTER_NAME-ops-instance --cluster $CLUSTER_NAME --resource-group $RESOURCE_GROUP --sr-resource-id /subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.DeviceRegistry/schemaRegistries/$SCHEMA_REGISTRY_NAME --broker-frontend-replicas 1 --broker-frontend-workers 1 --broker-backend-part 1 --broker-backend-workers 1 --broker-backend-rf 2 --broker-mem-profile Low
       ```
 
 - Confirm Azure IoT Operations installation  
@@ -117,33 +136,32 @@
 
 #### Deploy Cloud connector
 
-  - Download the data flow  
-    ```bash
-    curl -O https://raw.githubusercontent.com/chriscrcodes/smart-factory/main/artifacts/templates/azure-iot-operations/dataflows/silver-to-cloud.yaml
-    ```
-  - Modify file with the name of the event hub name space created in [Step 1](#step-1---provision-azure-resources) (`$EVENTHUB_NAMESPACE` variable):
-    - ```bash
-      sed -i 's/<EVENTHUB_NAMESPACE>/'"${EVENTHUB_NAMESPACE}"'/' silver-to-cloud.yaml
-      ```
-
-  - Modify file with the name of the event hub name created in [Step 1](#step-1---provision-azure-resources) (`$EVENTHUB` variable):
-    - ```bash
-      sed -i 's/<EVENTHUB>/'"${EVENTHUB}"'/' silver-to-cloud.yaml
-      ```
-
-  - Deploy the cloud connector
-    - ```bash
-      kubectl apply -f silver-to-cloud.yaml
-      ```
-
   - Authorize the cluster to connect to the event hub
     - Locate the Azure Event Hub name space you created in [Azure Portal](https://portal.azure.com/)
     - `Access Control (IAM)` > `Add` > `Add role assignment`
     - `Azure Event Hubs Data Sender` > `Next`
     - Assign access to `User, group, or service principal`
-    - `Select Members` > type `mq` to locate the `MQTT` extension used by Azure IoT Operations  
-      (For example: `/subscriptions/xxx/resourceGroups/xxx/providers/Microsoft.Kubernetes/connectedClusters/xxx/providers/Microsoft.KubernetesConfiguration/extensions/mq-xxx`)
-    - Repeat the same steps for the role `Azure Event Hubs Data Receiver`
+    - `Select Members` > type `azure-iot-operations-` to locate the `azure-iot-operations` extension  
+      (For example: `/subscriptions/xxx/resourceGroups/xxx/providers/Microsoft.Kubernetes/connectedClusters/xxx/providers/Microsoft.KubernetesConfiguration/extensions/azure-iot-operations-xxx`)
+
+  - Download the data flow  
+    ```bash
+    curl -O https://raw.githubusercontent.com/chriscrcodes/smart-factory/main/artifacts/templates/azure-iot-operations/dataflows/silver-to-cloud.yaml
+    ```
+  - Modify file with the name of the event hub name space created in [Step 1](#step-1---provision-azure-resources) (`$EVENTHUB_NAMESPACE` variable):
+    ```bash
+    sed -i 's/<EVENTHUB_NAMESPACE>/'"${EVENTHUB_NAMESPACE}"'/' silver-to-cloud.yaml
+    ```
+
+  - Modify file with the name of the event hub name created in [Step 1](#step-1---provision-azure-resources) (`$EVENTHUB` variable):
+    ```bash
+    sed -i 's/<EVENTHUB>/'"${EVENTHUB}"'/' silver-to-cloud.yaml
+    ```
+
+  - Deploy the cloud connector
+    ```bash
+    kubectl apply -f silver-to-cloud.yaml
+    ```
 
   - Confirm data flowing from Edge to Cloud
     - Locate the Azure Event Hub name space you created in [Azure Portal](https://portal.azure.com/)

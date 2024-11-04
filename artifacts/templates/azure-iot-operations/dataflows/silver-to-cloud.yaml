@@ -1,24 +1,7 @@
 apiVersion: connectivity.iotoperations.azure.com/v1beta1
 kind: DataflowEndpoint
 metadata:
-  name: mqtt-source
-  namespace: azure-iot-operations
-spec:
-  endpointType: Mqtt
-  mqttSettings:
-    host: "aio-broker:18883"
-    tls:
-      mode: Enabled
-      trustedCaCertificateConfigMapRef: azure-iot-operations-aio-ca-trust-bundle
-    authentication:
-      method: ServiceAccountToken
-      serviceAccountTokenSettings:
-        audience: aio-internal
----
-apiVersion: connectivity.iotoperations.azure.com/v1beta1
-kind: DataflowEndpoint
-metadata:
-  name: kafka-target
+  name: azure-eventhub
   namespace: azure-iot-operations
 spec:
   endpointType: Kafka
@@ -40,25 +23,14 @@ metadata:
   name: silver-to-cloud
   namespace: azure-iot-operations
 spec:
-  profileRef: evh-dataflow
+  profileRef: default
   operations:
     - operationType: source
       sourceSettings:
-        endpointRef: mqtt-source
+        endpointRef: default
         dataSources:
         - Silver/#
     - operationType: destination
       destinationSettings:
-        endpointRef: kafka-target
+        endpointRef: azure-eventhub
         dataDestination: <EVENTHUB>
----
-apiVersion: connectivity.iotoperations.azure.com/v1beta1
-kind: DataflowProfile
-metadata:
-  name: evh-dataflow
-  namespace: azure-iot-operations
-spec:
-  instanceCount: 1
-  diagnostics:
-    logs:
-      level: "debug"
