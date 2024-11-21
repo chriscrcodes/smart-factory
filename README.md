@@ -82,9 +82,6 @@ From `Bronze` (Edge: MQTT Data Simulator) ⇒ `Silver` (Edge: Azure IoT Operatio
 ## Prerequisites
 Microsoft Documentation: [Azure IoT Operations prerequisites](https://learn.microsoft.com/en-us/azure/iot-operations/deploy-iot-ops/howto-prepare-cluster?tabs=ubuntu)
 
-> **WARNING**: Azure IoT Operations is currently in preview.  
-You shouldn't use this preview software in production environments.
-
 ### Hardware requirements
 
 - **Resources**: 
