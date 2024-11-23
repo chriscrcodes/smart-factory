@@ -110,18 +110,20 @@ Microsoft Documentation: [Azure IoT Operations prerequisites](https://learn.micr
     - _Optional_: Virtual Machine (if you want to test everything in Azure Cloud)
  - Microsoft Fabric Tenant (you can try it for free [here](https://www.microsoft.com/en-us/microsoft-fabric/getting-started?msockid=27cd43526f4e6b2a1fa857d06e486a3c))
 
-## Demo
-
-![Factory Assistant User Interface](./artifacts/media/demo-video.gif "Factory Assistant User Interface")
-
-## Videos
-
-[![Video on the IoT Show](https://img.youtube.com/vi/-AxWwJU_G_U/hqdefault.jpg)](https://www.youtube.com/embed/-AxWwJU_G_U)  
-[![Video on the Arc Jumpstart Show](https://img.youtube.com/vi/cN6urmB_7jY/hqdefault.jpg)](https://www.youtube.com/embed/cN6urmB_7jY)
-
 ## Solution build steps
 
 ### 1. [Provision resources (Edge and Cloud)](./INSTALL-1.md)
 ### 2. [Connect your Edge platform to Cloud platform](./INSTALL-2.md)
 ### 3. [Configure the solution (Cloud part)](./INSTALL-3.md)
 ### 4. [Deploy and use the Generative AI Factory Assistant](./INSTALL-4.md)
+
+## Demo
+
+![Factory Assistant User Interface](./artifacts/media/demo-video.gif "Factory Assistant User Interface")
+
+## Videos
+
+- IoT Show hosted by Olivier Bloch
+  [![Video on the IoT Show](https://img.youtube.com/vi/-AxWwJU_G_U/hqdefault.jpg)](https://www.youtube.com/embed/-AxWwJU_G_U)  
+- Arc Jumpstart hosted by Lior Kamrat
+  [![Video on the Arc Jumpstart Show](https://img.youtube.com/vi/cN6urmB_7jY/hqdefault.jpg)](https://www.youtube.com/embed/cN6urmB_7jY)
