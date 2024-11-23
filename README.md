@@ -116,7 +116,8 @@ Microsoft Documentation: [Azure IoT Operations prerequisites](https://learn.micr
 
 ## Videos
 
-[![Video on the IoT Show](https://img.youtube.com/vi/-AxWwJU_G_U/hqdefault.jpg)](https://www.youtube.com/embed/-AxWwJU_G_U)
+[![Video on the IoT Show](https://img.youtube.com/vi/-AxWwJU_G_U/hqdefault.jpg)](https://www.youtube.com/embed/-AxWwJU_G_U)  
+[![Video on the Arc Jumpstart Show](https://img.youtube.com/vi/cN6urmB_7jY/hqdefault.jpg)](https://www.youtube.com/embed/cN6urmB_7jY)
 
 ## Solution build steps
 
