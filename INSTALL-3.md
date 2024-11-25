@@ -163,10 +163,10 @@
     - Click `Open event processor`
     - Set the field `EmployeeId` to `String` (click on the three dots)  
      ![fabric-eventstream-1-1](./artifacts/media/fabric_eventstream-1-1.png "fabric-eventstream-1-1")  
-    - Set the field `ProductId` to `String` (click on the three dots)   
+    - Set the field `ProductId` to `String` (same as above for `EmployeeId`)   
     - Set the field `Timestamp` to `DateTime` (click on the three dots)  
      ![fabric-eventstream-1-2](./artifacts/media/fabric_eventstream-1-2.png "fabric-eventstream-1-2")  
-    - Ensure the fields are correctly configured as the picture below:
+    - Ensure the fields are correctly configured as the picture below:  
      ![fabric-eventstream-1](./artifacts/media/fabric_eventstream-1.png "fabric-eventstream-1")
     - Click `Done`
     - Click `Add`    

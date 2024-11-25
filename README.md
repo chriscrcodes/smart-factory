@@ -123,7 +123,7 @@ Microsoft Documentation: [Azure IoT Operations prerequisites](https://learn.micr
 
 ## Videos
 
-- **IoT Show** hosted by Olivier Bloch  
+- **IoT Show** hosted by `Olivier Bloch`  
   [![Video on the IoT Show](https://img.youtube.com/vi/-AxWwJU_G_U/hqdefault.jpg)](https://www.youtube.com/embed/-AxWwJU_G_U)  
-- **Azure Arc Jumpstart** hosted by Lior Kamrat  
+- **Azure Arc Jumpstart** hosted by `Lior Kamrat`  
   [![Video on the Arc Jumpstart Show](https://img.youtube.com/vi/cN6urmB_7jY/hqdefault.jpg)](https://www.youtube.com/embed/cN6urmB_7jY)
