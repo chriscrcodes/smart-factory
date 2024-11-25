@@ -66,7 +66,7 @@
      ```
    - Install `Azure IoT Operations extension`:
       ```bash
-      az extension add --allow-preview true --name azure-iot-ops --version 0.8.0b1
+      az extension add --name azure-iot-ops --version 1.0.0
       ```
    - Create a schema registry that connects to your storage account:
      ```bash
@@ -103,7 +103,7 @@
       - Memory: `16GB`
       - Storage: `30GB`
 
-  - **Operating System**: the solution requires a Linux-based system, specifically a VM or physical machine running `Linux Ubuntu 22.04`. This system will perform as an Edge server, handling queries directly from the production line and interfacing with other operational systems.
+  - **Operating System**: the solution requires a Linux-based system, specifically a VM or physical machine running `Linux Ubuntu 22.04` or `Linux Ubuntu 24.04`. This system will perform as an Edge server, handling queries directly from the production line and interfacing with other operational systems.
 
 - Option A (Virtual Machine in Azure)
    - If you want to use a Virtual Machine in Azure, you can deploy it using the Deploy button below:  
@@ -164,11 +164,11 @@
     ```
   - Install `Azure arc extension`:
     ```bash
-    az extension add --allow-preview true --name connectedk8s --version 1.10.1
+    az extension add --name connectedk8s --version 1.10.3
     ```
   - Install `Azure IoT Operations extension`:
     ```bash
-    az extension add --allow-preview true --name azure-iot-ops --version 0.8.0b1
+    az extension add --name azure-iot-ops --version 1.0.0
     ```
 
 - Prepare your Cluster for Azure IoT Operations

@@ -2,6 +2,6 @@ utils==1.0.2
 asyncio==3.4.3
 azure-kusto-data==4.6.1
 azure-kusto-data[aio]==4.6.1
-semantic-kernel==1.10.0
-openai==1.50.2
-streamlit==1.38.0
+semantic-kernel==1.14.0
+openai==1.54.4
+streamlit==1.40.1
