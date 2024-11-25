@@ -18,10 +18,8 @@
 1. Click on `Get data` > `Local file` > `New table` > type `operators`
 2. Upload the file [operators.csv](./artifacts/templates/fabric/reference-datasets/operators.csv) > `Next`  
 ![fabric-upload](./artifacts/media/fabric_operators-1.png "fabric-upload")
-3. Click on `First row is column header` > then `Edit columns` > set `EmployeeId` column as Type `string` and click `Apply`  
-![fabric-columnsedit](./artifacts/media/fabric_operators-2.png "fabric-columnsedit")
-4. Click `Finish`, wait for the ingestion (status "Successfully ingested") and click `Close`
-![fabric-columns](./artifacts/media/fabric_operators-3.png "fabric-columns")
+3. Click on `First row is column header` > `Finish`, wait for the ingestion (status "Successfully ingested") and click `Close`
+![fabric-columns](./artifacts/media/fabric_operators-2.png "fabric-columns")
 - Create the table for `assets` dataset
 1. Click on `Get data` > `Local file` > `New table` > type `assets`
 2. Upload the file [assets.csv](./artifacts/templates/fabric/reference-datasets/assets.csv) > `Next`  
@@ -41,27 +39,30 @@
 - Add the following query:
     ```
     .create table aio_silver (
-        Timestamp: string,
-        UNS: string,
-        Enterprise: string,
-        Site: string,
         Area: string,
-        Line: string,
         Cell: string,
-        Latitude: real,
-        Longitude: real,
-        PlannedProductionTime: real,
-        OperatingTime: real,
-        TotalPartsCount: real,
-        GoodPartsCount: real,
-        IdealCycleTime: real,
-        Downtime: real,
-        EnergyConsumption: real,
-        Temperature: real,
-        Shift: real,
-        ShiftHours: string, 
+        Downtime: double,
         EmployeeId: string,
-        ProductId: real
+        EnergyConsumption: double,
+        Enterprise: string,
+        GoodPartsCount: int64,
+        IdealCycleTime: int64,
+        Latitude: double,
+        Line: string,
+        Longitude: double,
+        OperatingTime: int64,
+        PlannedProductionTime: int64,
+        ProductId: string,
+        Shift: int64,
+        ShiftHours: string,
+        Site: string,
+        Temperature: double,
+        Timestamp: datetime,
+        TotalPartsCount: int64,
+        UNS: string,
+        EventProcessedUtcTime: datetime,
+        PartitionId: int64,
+        EventEnqueuedUtcTime: datetime
     )
     ```
 - Select the query portion and click `Run` to create the table `aio_silver`
@@ -84,7 +85,6 @@
     ```
     .set aio_gold <| 
     EnrichWithReferenceData()
-    | limit 0
     ```
 - Select the query portion and click `Run` to create the table `aio_gold`
 - You should now see 5 tables:  
@@ -134,20 +134,19 @@
 1. Configure event stream source
     - Click on `Workspaces` > `Smart Factory`
     - `New` > `Eventstream` > choose the name `aio_silver` and click `Create`
-    - Click on `New source` > `Azure Event Hubs`
-    - Choose a `Source name`
-    - `Cloud connection` > `Create new`
+    - Click on `Add source` > `External sources` > `Azure Event Hubs` > `Connect`
+    - Create new connection
     - Retrieve variables created in [Part 1 - Provision resources (Edge and Cloud)](./INSTALL-1.md) ==> **Note(1)**
     - `Event Hub namespace` > `$EVENTHUB_NAMESPACE` variable
     - `Event Hub` > `$EVENTHUB_NAME` variable
     - Choose a connection name
     - `Shared Access Key Name` > `$EVENTHUB_KEYNAME` variable
     - `Shared Access Key` > `$EVENTHUB_KEY` variable
-    - Tick the box `Test connection` and click `Create`
-    - Select the event hub connection in `Cloud connection`
-    - `Consumer group` > `Create new` > type `fabric` and click `Done`
+    - Check that the connection name is correct
+    - Tick the box `Test connection` and click `Connect`
+    - `Consumer group` > type `fabric`
     - `Data format` > select `Json`
-    - Tick the box `Activate streaming after adding data source` and click `Add`
+    - `Next` > `Add`
 
 2. Configure event stream destination
     - Click on `New destination` > `KQL Database`
@@ -160,29 +159,18 @@
     - Tick the box `Activate streaming after adding data source`
 
 3. Configure fields mapping
+    - You may see 3 authoring errors
     - Click `Open event processor`
-    - A new wizard will open
-    - Remove connection from `aio_silver` to `KQLDatabase1`
-    - Select `aio_silver` > `Operations` > `Manage fields`
-    - Connect `Managefields1` to `KQLDatabase1`
-    - Connect `aio_silver` to `Managefields1`
-    - Click `Add all fields`
-    - Set the field `Timestamp` to `DateTime`  
-     ![fabric-eventstream-1-1](./artifacts/media/fabric_eventstream-1-1.png "fabric-eventstream-1-1")
-    - Go to the end of the list of fields and remove the 3 following fields:
-        - `EventProcessedUtcTime`
-        - `PartitionId`
-        - `EventEnqueuedUtcTime`
-        - (`...` and `Remove`)
-        ![fabric-eventstream-1](./artifacts/media/fabric_eventstream-1.png "fabric-eventstream-1")
-        - Click `Done` twice
+    - Set the field `EmployeeId` to `String` (click on the three dots)  
+     ![fabric-eventstream-1-1](./artifacts/media/fabric_eventstream-1-1.png "fabric-eventstream-1-1")  
+    - Set the field `ProductId` to `String` (same as above for `EmployeeId`)   
+    - Set the field `Timestamp` to `DateTime` (click on the three dots)  
+     ![fabric-eventstream-1-2](./artifacts/media/fabric_eventstream-1-2.png "fabric-eventstream-1-2")  
+    - Ensure the fields are correctly configured as the picture below:  
+     ![fabric-eventstream-1](./artifacts/media/fabric_eventstream-1.png "fabric-eventstream-1")
+    - Click `Done`
     - Click `Add`    
 
         ![fabric-eventstream-2](./artifacts/media/fabric_eventstream-2.png "fabric-eventstream-2")
-
-#### Confirm that the Data stream is connected
-- Click on `Workspaces` > `Smart Factory`
-- Select the database created (type: `KQL Database`)
-- Click on `Data stream` and confirm the Status is `Connected`
 
 - ✅ **You can now continue to** > [Part 4 - Deploy and use the Generative AI Factory Assistant](./INSTALL-4.md)
