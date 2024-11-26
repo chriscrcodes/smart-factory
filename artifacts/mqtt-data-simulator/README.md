@@ -29,7 +29,7 @@ This project simulates data publishing to an MQTT broker, generating dynamic dat
 
 1. Clone the repository:
     ```bash
-    git clone https://github.com/chriscrcodes/smart-factory.git
+    git clone https://github.com/chriscrcodes/talk-to-your-factory.git
     cd artifacts/mqtt-data-simulator
     ```
 
