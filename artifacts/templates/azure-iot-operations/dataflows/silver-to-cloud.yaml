@@ -1,4 +1,4 @@
-apiVersion: connectivity.iotoperations.azure.com/v1beta1
+apiVersion: connectivity.iotoperations.azure.com/v1
 kind: DataflowEndpoint
 metadata:
   name: azure-eventhub
@@ -17,7 +17,7 @@ spec:
       systemAssignedManagedIdentitySettings:
         audience: https://<EVENTHUB_NAMESPACE>.servicebus.windows.net
 ---
-apiVersion: connectivity.iotoperations.azure.com/v1beta1
+apiVersion: connectivity.iotoperations.azure.com/v1
 kind: Dataflow
 metadata:
   name: silver-to-cloud
