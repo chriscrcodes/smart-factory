@@ -20,7 +20,7 @@
      ```bash
      az account set --subscription $SUBSCRIPTION_ID
      ```
-   - Create a service principal (service account) to manage Azure:
+   - Create a service principal (service account) to manage Azure from the Edge Gateway running Azure IoT Operations:
      ```bash
      SPN=$(az ad sp create-for-rbac --name AIO_SP_Contrib --role Contributor --scopes /subscriptions/$SUBSCRIPTION_ID)
      ```
@@ -113,7 +113,7 @@
       > **Note**: `Standard_D4s_v3` is the recommended size for the Azure VM.
 
 - Option B (your own Industrial PC or Virtual Machine)
-  - Install `Linux Ubuntu 22.04`
+  - Install `Linux Ubuntu 22.04` or `Linux Ubuntu 24.04`
 
 - Prepare a K3s Kubernetes Cluster on Ubuntu (login and execute the following commands on your Ubuntu Machine)
    - Install `curl` and `nano`:
