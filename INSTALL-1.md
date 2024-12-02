@@ -119,7 +119,7 @@
    - Install `curl` and `nano`:
      ```bash
      sudo apt update
-     sudo apt install curl nano jq -y
+     sudo apt install curl nano -y
      ```
 - Install K3s
    - Run the `K3s installation script`:
