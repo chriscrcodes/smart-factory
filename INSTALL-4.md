@@ -70,7 +70,7 @@
     http://localhost:8501/
     ```
 - You can now query the database using Natural Language  
-**Note**: **no data from the database is transmitted to the Large Language Model** in Azure Open AI, but only the prompt, and the model will return the appropriate query to execute.  
+    > **IMPORTANT**: No actual data from the database is transmitted to the Large Language Model; only the prompt and the database schema are shared. The LLM will generate the query to be executed against the database, but it won't execute the query itself.  
 - Some example queries are provided.
 
     ![Factory Assistant User Interface](./artifacts/media/demo-video.gif "Factory Assistant User Interface")

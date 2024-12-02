@@ -4,14 +4,14 @@
 🤖 Smart Factory demo, enhanced by Generative AI.  
 🏭 See how the Smart Factory leverages Generative AI to optimize its operations!  
 🔍 Real-time ingestion and processing of operations data (OT): operators, manufactured products, and machine maintenance schedules.  
-🗣️ Data processing: Edge and Cloud, with a Semantic Kernel to power the Factory Assistant, for smarter interactions.  
+🗣️ Data processing: Edge and Cloud, with a Semantic Kernel to power the Factory Agent, for smarter interactions.  
 
 ### Key features and benefits
 
 - **Data Processing**: Data structure following a **Medallion Architecture**, with the goal of incrementally and progressively improving the structure and quality of data as it flows through each layer of the architecture.  
 From `Bronze` (Edge: MQTT Data Simulator) ⇒ `Silver` (Edge: Azure IoT Operations) ⇒ `Gold` (Cloud: Microsoft Fabric) layer tables.
 
-- **Natural Language Processing (NLP)**: a Smart Assistant, enhanced by Generative AI, empowers operators, so they can ask complex questions about machine operations, staff, production quality, as if they were speaking to a human expert in the Factory.
+- **Natural Language Processing (NLP)**: a Factory Agent, enhanced by Generative AI, empowers operators, so they can ask complex questions about machine operations, staff, production quality, as if they were speaking to a human expert in the Factory.
 
 ## Architecture
 
@@ -45,20 +45,20 @@ From `Bronze` (Edge: MQTT Data Simulator) ⇒ `Silver` (Edge: Azure IoT Operatio
 4. [**Microsoft Fabric Real-Time Intelligence**](https://learn.microsoft.com/en-us/fabric/real-time-intelligence/overview)  
     Processes data in Azure: materialize data as a Table, enrich with Cloud reference datasets (Operators, Assets and Products).
 
-5. [**Generative AI Factory Assistant**](https://learn.microsoft.com/en-us/azure/ai-services/openai/overview)  
-    Introducing a custom Large Language Model (LLM) Factory Assistant, based on OpenAI model 'GPT-4o', that enables natural language communication with the factory. This assistant simplifies the process of retrieving information from various systems and databases.
+5. [**Generative AI Factory Agent**](https://learn.microsoft.com/en-us/azure/ai-services/openai/overview)  
+    Introducing a custom Large Language Model (LLM) Factory Agent, based on OpenAI model 'GPT-4o', that enables natural language communication with the factory. This agent simplifies the process of retrieving information from various systems and databases.
 
 ### Communication flow
 
-![Factory Assistant Communication Flow](./artifacts/media/factory-assistant-communication-flow.png "Factory Assistant Communication Flow")
+![Factory Agent Communication Flow](./artifacts/media/factory-agent-communication-flow.png "Factory Agent Communication Flow")
 
-1. **User Prompt**: user asks a question to the Factory Assistant.  
+1. **User Prompt**: user asks a question to the Factory Agent.  
     The graphical user interface is based on the open-source framework [`Streamlit`](https://streamlit.io/).
 2. **Custom Large Language Model (LLM)**: analyzes the prompt and generate the corresponding query to be executed to the database in Microsoft Fabric.  
 3. [**Semantic Kernel**](https://aka.ms/semantic-kernel): execute query and return results (Python application).
 
 #### Creating complex queries from natural language prompt - Example
-![Factory Assistant Prompt](./artifacts/media/factory-assistant-prompt.png "Factory Assistant Prompt")
+![Factory Agent Prompt](./artifacts/media/factory-agent-prompt.png "Factory Agent Prompt")
 
 1. **Prompt**: _"Determine the yield percentage for each Site this month by comparing the total units produced to the number of good units produced."_
 2. **Generative AI Model**: analyzes the prompt and generate the corresponding query to be executed to the database.  
@@ -97,7 +97,6 @@ Microsoft Documentation: [Azure IoT Operations prerequisites](https://learn.micr
  - [`python >=v3.10`](https://www.python.org/) Programming Language
  - [`curl`](https://curl.se/) command line tool that developers use to transfer data to and from a server.
  - [`nano`](https://www.nano-editor.org/) text editor.
- - [`jq`](https://github.com/jqlang/jq) command-line JSON processor.
  - [`Azure CLI`](https://learn.microsoft.com/en-us/cli/azure/) the Azure command-line interface.
 
 ### Cloud services requirements
@@ -115,11 +114,11 @@ Microsoft Documentation: [Azure IoT Operations prerequisites](https://learn.micr
 ### 1. [Provision resources (Edge and Cloud)](./INSTALL-1.md)
 ### 2. [Connect your Edge platform to Cloud platform](./INSTALL-2.md)
 ### 3. [Configure the solution (Cloud part)](./INSTALL-3.md)
-### 4. [Deploy and use the Generative AI Factory Assistant](./INSTALL-4.md)
+### 4. [Deploy and use the Generative AI Factory Agent](./INSTALL-4.md)
 
 ## Demo
 
-![Factory Assistant User Interface](./artifacts/media/demo-video.gif "Factory Assistant User Interface")
+![Factory Agent User Interface](./artifacts/media/demo-video.gif "Factory Agent User Interface")
 
 ## Videos
 
