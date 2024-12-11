@@ -154,21 +154,13 @@
       shell: ./dss_set --key products --file "products.json" --address localhost
 
     - name: Deploy Factory Simulator - configuration
-      kubectl:
-        state: present
-        definition: https://raw.githubusercontent.com/chriscrcodes/talk-to-your-factory/main/artifacts/templates/k3s/pods/simulator/configuration.yaml
+      shell: kubectl apply -f https://raw.githubusercontent.com/chriscrcodes/talk-to-your-factory/main/artifacts/templates/k3s/pods/simulator/configuration.yaml
 
     - name: Deploy Factory Simulator - deployment
-      kubectl:
-        state: present
-        definition: https://raw.githubusercontent.com/chriscrcodes/talk-to-your-factory/main/artifacts/templates/k3s/pods/simulator/deployment.yaml
+      shell: kubectl apply -f https://raw.githubusercontent.com/chriscrcodes/talk-to-your-factory/main/artifacts/templates/k3s/pods/simulator/deployment.yaml
 
     - name: Deploy Factory Simulator - bronze to silver
-      kubectl:
-        state: present
-        definition: https://raw.githubusercontent.com/chriscrcodes/talk-to-your-factory/main/artifacts/templates/azure-iot-operations/dataflows/bronze-to-silver.yaml
+      shell: kubectl apply -f https://raw.githubusercontent.com/chriscrcodes/talk-to-your-factory/main/artifacts/templates/azure-iot-operations/dataflows/bronze-to-silver.yaml
 
     - name: Deploy the cloud connector
-      kubectl:
-        state: present
-        definition: ./silver-to-cloud.yaml
+      shell: kubectl apply -f ./silver-to-cloud.yaml
