@@ -64,6 +64,11 @@
     - name: Check Azure IoT Operations prerequisites
       shell: az iot ops check
 
+    - name: Connecting to Azure subscription
+      shell: |
+        az login --service-principal --username {{ AIO_SP_APPID }} --password {{ AIO_SP_SECRET }} --tenant {{ AIO_SP_TENANT }}
+        az account set --subscription {{ SUBSCRIPTION_ID }}
+
     - name: Connecting Edge cluster to Azure Arc
       shell: >
         az connectedk8s connect --name {{ AIO_CLUSTER_NAME }} --location {{ LOCATION }} --resource-group {{ RESOURCE_GROUP }} --subscription {{ SUBSCRIPTION_ID }} --enable-oidc-issuer --enable-workload-identity --disable-auto-upgrade
