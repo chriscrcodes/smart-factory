@@ -3,7 +3,7 @@
   become: true
   gather_facts: no
   vars_files:
-    - variables_edge.yaml
+    - variables.yaml
 
   tasks:
     - name: Update apt repository
@@ -92,6 +92,7 @@
          - service-account-max-token-expiration=24h
         EOL'
         sudo systemctl restart k3s
+        sudo k3s check-config
 
     - name: Initialize Azure IoT Operations foundations installation
       shell: >

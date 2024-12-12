@@ -1,0 +1,96 @@
+---
+- name: Deploy Azure Resources
+  hosts: localhost
+  gather_facts: no
+  vars_files:
+    - variables.yaml
+
+  tasks:
+    - name: Set Azure subscription
+      ansible.builtin.command: az account set --subscription "{{ SUBSCRIPTION_ID }}"
+
+    - name: Register Azure subscription providers
+      ansible.builtin.command: az provider register --name "{{ item }}"
+      loop:
+        - Microsoft.ExtendedLocation
+        - Microsoft.Kubernetes
+        - Microsoft.KubernetesConfiguration
+        - Microsoft.IoTOperations
+        - Microsoft.DeviceRegistry
+        - Microsoft.SecretSyncController
+
+    - name: Install Azure IoT Operations extension
+      ansible.builtin.command: az extension add --upgrade --name azure-iot-ops
+
+    - name: Create resource group
+      ansible.builtin.command: az group create --location "{{ LOCATION }}" --resource-group "{{ RESOURCE_GROUP }}" --subscription "{{ SUBSCRIPTION_ID }}"
+
+    - name: Retrieve Azure Arc Object Id to connect cluster
+      ansible.builtin.command: az ad sp show --id bc313c14-388c-4e7d-a58e-70017303ee3b --query id --output tsv
+      register: arc_object_id
+
+    - name: Creating Service Principal to manage Azure from Edge cluster
+      ansible.builtin.command: az ad sp create-for-rbac --name "{{ AIO_SERVICE_PRINCIPAL }}" --role Contributor --scopes "/subscriptions/{{ SUBSCRIPTION_ID }}/resourceGroups/{{ RESOURCE_GROUP }}"
+      register: aio_sp
+
+    - name: Creating Service Principal for the Factory Agent
+      ansible.builtin.command: az ad sp create-for-rbac --name "{{ FACTORY_AGENT_SERVICE_PRINCIPAL }}"
+      register: factory_agent_sp
+
+    - name: Create managed identity for secrets
+      ansible.builtin.command: az identity create --resource-group "{{ RESOURCE_GROUP }}" --name "{{ AIO_MANAGED_IDENTITY_SECRETS }}"
+      register: managed_identity_secrets
+
+    - name: Create managed identity for components
+      ansible.builtin.command: az identity create --resource-group "{{ RESOURCE_GROUP }}" --name "{{ AIO_MANAGED_IDENTITY_COMPONENTS }}"
+      register: managed_identity_components
+
+    - name: Create Key Vault
+      ansible.builtin.command: az keyvault create --enable-rbac-authorization false --name "{{ KEYVAULT_NAME }}" --resource-group "{{ RESOURCE_GROUP }}"
+      register: keyvault
+
+    - name: Create storage account
+      ansible.builtin.command: az storage account create --name "{{ STORAGEACCOUNT_NAME }}" --resource-group "{{ RESOURCE_GROUP }}" --enable-hierarchical-namespace
+      register: storageaccount
+
+    - name: Create Event Hub namespace
+      ansible.builtin.command: az eventhubs namespace create --name "{{ EVENTHUB_NAMESPACE }}" --resource-group "{{ RESOURCE_GROUP }}" --location "{{ LOCATION }}"
+
+    - name: Create Event Hub
+      ansible.builtin.command: az eventhubs eventhub create --name "{{ EVENTHUB_NAME }}" --resource-group "{{ RESOURCE_GROUP }}" --namespace-name "{{ EVENTHUB_NAMESPACE }}"
+      register: eventhub
+
+    - name: Create Event Hub authorization rule
+      ansible.builtin.command: az eventhubs eventhub authorization-rule create --resource-group "{{ RESOURCE_GROUP }}" --namespace-name "{{ EVENTHUB_NAMESPACE }}" --eventhub-name "{{ EVENTHUB_NAME }}" --name Listen --rights Listen
+
+    - name: Create Azure IoT Operations schema registry
+      ansible.builtin.command: az iot ops schema registry create --name "aio" --resource-group "{{ RESOURCE_GROUP }}" --registry-namespace "{{ AIO_SCHEMA_REGISTRY_NAMESPACE }}" --sa-resource-id "{{ storageaccount.stdout | from_json | json_query('id') }}"
+      register: schemaregistry
+
+    - name: Create Azure Open AI Service
+      ansible.builtin.command: az cognitiveservices account create --name "{{ AZURE_OPENAI_NAME }}" --resource-group "{{ RESOURCE_GROUP }}" --location "eastus" --kind OpenAI --sku s0 --subscription "{{ SUBSCRIPTION_ID }}"
+
+    - name: Deploy gpt4-o model
+      ansible.builtin.command: az cognitiveservices account deployment create --resource-group "{{ RESOURCE_GROUP }}" --name "{{ AZURE_OPENAI_NAME }}" --deployment-name "gpt-4o" --model-name "gpt-4o" --model-version "2024-08-06" --model-format OpenAI --sku-capacity 1 --sku-name "Standard"
+
+    - name: Assign Role Based Access Control Administrator role to app registration
+      ansible.builtin.command: az role assignment create --assignee "{{ aio_sp.stdout | from_json | json_query('appId') }}" --role "Role Based Access Control Administrator" --scope "subscriptions/{{ SUBSCRIPTION_ID }}/resourceGroups/{{ RESOURCE_GROUP }}"
+
+    - name: Assign Key Vault Secrets Officer role to managed identity
+      ansible.builtin.command: az role assignment create --assignee "{{ managed_identity_secrets.stdout | from_json | json_query('principalId') }}" --role "Key Vault Secrets Officer" --scope "{{ keyvault.stdout | from_json | json_query('id') }}"
+
+    - name: Insert variables information in variables.yaml file
+      ansible.builtin.blockinfile:
+        path: ./variables.yaml
+        block: |
+          AIO_SP_APPID: "{{ aio_sp.stdout | from_json | json_query('appId') }}"
+          AIO_SP_SECRET: "{{ aio_sp.stdout | from_json | json_query('password') }}"
+          AIO_SP_TENANT: "{{ aio_sp.stdout | from_json | json_query('tenant') }}"
+          FACTORY_AGENT_SP_APPID: "{{ factory_agent_sp.stdout | from_json | json_query('appId') }}"
+          FACTORY_AGENT_SP_SECRET: "{{ factory_agent_sp.stdout | from_json | json_query('password') }}"
+          ARC_OBJECT_ID: "{{ arc_object_id.stdout }}"
+          SCHEMA_REGISTRY_ID: "{{ schemaregistry.stdout | from_json | json_query('id') }}"
+          KEYVAULT_ID: "{{ keyvault.stdout | from_json | json_query('id') }}"
+          AIO_MANAGED_IDENTITY_SECRETS_ID: "{{ managed_identity_secrets.stdout | from_json | json_query('id') }}"
+          AIO_MANAGED_IDENTITY_COMPONENTS_ID: "{{ managed_identity_components.stdout | from_json | json_query('id') }}"
+          EVENTHUB_ID: "{{ eventhub.stdout | from_json | json_query('id') }}"
