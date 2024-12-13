@@ -1,0 +1,25 @@
+---
+- name: Unprovision Azure Cloud Resources
+  hosts: localhost
+  gather_facts: no
+  vars_files:
+    - variables.yaml
+
+  tasks:
+    - name: Set Azure subscription
+      ansible.builtin.shell: az account set --subscription "{{ SUBSCRIPTION_ID }}"
+
+    - name: Delete Azure Resource Group
+      ansible.builtin.shell: az group delete --resource-group "{{ RESOURCE_GROUP }}" --yes
+
+    - name: Purge Azure Key Vault
+      ansible.builtin.shell: az keyvault purge --no-wait --name "{{ KEYVAULT_NAME }}" --location "{{ LOCATION }}"
+
+    - name: Purge Azure Open AI Service
+      ansible.builtin.shell: az cognitiveservices account purge --name "{{ AZURE_OPENAI_NAME }}" --resource-group "{{ RESOURCE_GROUP }}" --location "eastus"
+
+    - name: Delete Service Principal for the Factory Agent
+      ansible.builtin.shell: az ad app delete --id "{{ FACTORY_AGENT_SP_APPID }}"
+
+    - name: Delete Service Principal to manage Azure from Edge cluster
+      ansible.builtin.shell: az ad app delete --id "{{ AIO_SP_APPID }}"

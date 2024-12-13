@@ -2,6 +2,17 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "deployBastion": {
+            "type": "string",
+            "allowedValues": [
+                "yes",
+                "no"
+            ],
+            "defaultValue": "yes",
+            "metadata": {
+                "description": "Connect to VM via Bastion Host."
+            }
+        },
         "vmName": {
             "type": "string",
             "defaultValue": "azurevm",
@@ -52,12 +63,12 @@
         "nsgName": "nsg",
         "vnetName": "vnet",
         "vnetAddressPrefix": "10.0.0.0/16",
+        "bastionHostname": "bastion",
         "bastionSubnetName": "AzureBastionSubnet",
         "bastionSubnetAddressPrefix": "10.0.0.0/24",
+        "bastionPublicIpAddressName": "[format('{0}-pip', variables('bastionHostname'))]",
         "vmSubnetName": "[format('{0}-subnet', parameters('vmName'))]",
         "vmSubnetAddressPrefix": "10.0.1.0/24",
-        "bastionHostName": "bastion",
-        "bastionPublicIpAddressName": "[format('{0}-pip', variables('bastionHostName'))]",
         "vmPublicIpAddressName": "[format('{0}-pip', parameters('vmName'))]",
         "vmNetworkInterfaceName": "[format('{0}-nic', parameters('vmName'))]",
         "vmDiskType": "Standard_LRS",
@@ -97,18 +108,6 @@
         {
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2022-07-01",
-            "name": "[variables('bastionPublicIpAddressName')]",
-            "location": "[resourceGroup().location]",
-            "sku": {
-                "name": "Standard"
-            },
-            "properties": {
-                "publicIPAllocationMethod": "Static"
-            }
-        },
-        {
-            "type": "Microsoft.Network/publicIPAddresses",
-            "apiVersion": "2022-07-01",
             "name": "[variables('vmPublicIpAddressName')]",
             "location": "[resourceGroup().location]",
             "sku": {
@@ -119,6 +118,20 @@
             }
         },
         {
+            "condition": "[equals(parameters('deployBastion'), 'yes')]",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2020-11-01",
+            "name": "[variables('bastionPublicIpAddressName')]",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Standard"
+            },
+            "properties": {
+                "publicIPAllocationMethod": "Static"
+            }
+        },
+        {
+            "condition": "[equals(parameters('deployBastion'), 'yes')]",
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2022-07-01",
             "name": "[variables('nsgName')]",
@@ -177,19 +190,6 @@
                             "destinationAddressPrefix": "VirtualNetwork",
                             "access": "Allow",
                             "priority": 130,
-                            "direction": "Inbound"
-                        }
-                    },
-                    {
-                        "name": "DenyAllInBound",
-                        "properties": {
-                            "protocol": "*",
-                            "sourcePortRange": "*",
-                            "sourceAddressPrefix": "*",
-                            "destinationPortRange": "*",
-                            "destinationAddressPrefix": "*",
-                            "access": "Deny",
-                            "priority": 1000,
                             "direction": "Inbound"
                         }
                     },
@@ -253,18 +253,29 @@
                             "priority": 130,
                             "direction": "Outbound"
                         }
-                    },
+                    }
+                ]
+            }
+        },
+        {
+            "condition": "[equals(parameters('deployBastion'), 'no')]",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2022-07-01",
+            "name": "[variables('nsgName')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "securityRules": [
                     {
-                        "name": "DenyAllOutBound",
+                        "name": "AllowSSH",
                         "properties": {
-                            "protocol": "*",
+                            "protocol": "Tcp",
                             "sourcePortRange": "*",
-                            "destinationPortRange": "*",
+                            "destinationPortRange": "22",
                             "sourceAddressPrefix": "*",
                             "destinationAddressPrefix": "*",
-                            "access": "Deny",
+                            "access": "Allow",
                             "priority": 1000,
-                            "direction": "Outbound"
+                            "direction": "Inbound"
                         }
                     }
                 ]
@@ -286,22 +297,7 @@
         {
             "type": "Microsoft.Network/virtualNetworks/subnets",
             "apiVersion": "2021-03-01",
-            "name": "[concat(variables('vnetName'), '/', variables('bastionSubnetName'))]",
-            "properties": {
-                "addressPrefix": "[variables('bastionSubnetAddressPrefix')]",
-                "networkSecurityGroup": {
-                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgName'))]"
-                }
-            },
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]",
-                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgName'))]"
-            ]
-        },
-        {
-            "type": "Microsoft.Network/virtualNetworks/subnets",
-            "apiVersion": "2021-03-01",
-            "name": "[concat(variables('vnetName'), '/', variables('vmSubnetName'))]",
+            "name": "[format('{0}/{1}', variables('vnetName'), variables('vmSubnetName'))]",
             "properties": {
                 "addressPrefix": "[variables('vmSubnetAddressPrefix')]",
                 "networkSecurityGroup": {
@@ -314,14 +310,31 @@
             ]
         },
         {
+            "condition": "[equals(parameters('deployBastion'), 'yes')]",
+            "type": "Microsoft.Network/virtualNetworks/subnets",
+            "apiVersion": "2021-03-01",
+            "name": "[format('{0}/{1}', variables('vnetName'), variables('bastionSubnetName'))]",
+            "properties": {
+                "addressPrefix": "[variables('bastionSubnetAddressPrefix')]",
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgName'))]"
+                }
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgName'))]"
+            ]
+        },
+        {
+            "condition": "[equals(parameters('deployBastion'), 'yes')]",
             "type": "Microsoft.Network/bastionHosts",
-            "apiVersion": "2022-07-01",
+            "apiVersion": "2020-11-01",
             "name": "[variables('bastionHostName')]",
             "location": "[resourceGroup().location]",
             "properties": {
                 "ipConfigurations": [
                     {
-                        "name": "IpConf",
+                        "name": "bastionHostIpConfig",
                         "properties": {
                             "subnet": {
                                 "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnetName'), variables('bastionSubnetName'))]"
@@ -334,9 +347,9 @@
                 ]
             },
             "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', variables('bastionPublicIpAddressName'))]",
                 "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]",
-                "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnetName'), variables('bastionSubnetName'))]",
-                "[resourceId('Microsoft.Network/publicIPAddresses', variables('bastionPublicIpAddressName'))]"
+                "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnetName'), variables('bastionSubnetName'))]"
             ]
         },
         {
@@ -358,11 +371,15 @@
                             }
                         }
                     }
-                ]
+                ],
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgName'))]"
+                }
             },
             "dependsOn": [
                 "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]",
                 "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnetName'), variables('vmSubnetName'))]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgName'))]",
                 "[resourceId('Microsoft.Network/publicIPAddresses', variables('vmPublicIpAddressName'))]"
             ]
         },

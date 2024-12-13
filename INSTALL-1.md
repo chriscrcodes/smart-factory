@@ -1,101 +1,57 @@
-### Part 1 - Provision resources (Edge and Cloud)
+# Part 1 - Provision resources (Edge and Cloud)
 
-#### Prepare and provision Cloud platform
+## Prepare and provision Cloud platform
+   - Download the file [`1_cloud-provision.yaml`](./artifacts/templates/deploy/1_cloud-provision.yaml)
+   - Download the file [`variables_template.yaml`](./artifacts/templates/deploy/variables_template.yaml) and rename it to `variables.yaml`
+   - Define variables in file `variables.yaml` to create Azure resources:
+      ```bash
+      SUBSCRIPTION_ID: ""                   # Id of your Azure subscription
+      LOCATION: ""                          # Location (Azure region) where to create resources
+      RESOURCE_GROUP: ""                    # Name of the Resource Group
+      AIO_SERVICE_PRINCIPAL: ""             # Name of the Service Principal (service account) to manage Azure from the Edge Cluster, using Azure CLI (command-line interface)
+      FACTORY_AGENT_SERVICE_PRINCIPAL: ""   # Name of the Service Principal (service account) for the Factory Agent
+      AIO_MANAGED_IDENTITY_SECRETS: ""      # Name of the Managed Identity for Azure IoT Operations secrets
+      AIO_MANAGED_IDENTITY_COMPONENTS: ""   # Name of the Managed Identity for Azure IoT Operations components
+      KEYVAULT_NAME: ""                     # Name of the Key Vault
+      STORAGEACCOUNT_NAME: ""               # Name of the Storage Account. Length: 3-24. Valid Characters: lowercase letters and numbers.
+      EVENTHUB_NAMESPACE: ""                # Name of the Event Hub Namespace
+      EVENTHUB_NAME: ""                     # Name of the Event Hub inside the Event Hub Namespace
+      AIO_SCHEMA_REGISTRY_NAMESPACE: ""     # Name of the Schema Registry. Valid Characters: lowercase letters and numbers.
+      AZURE_OPENAI_NAME: ""                 # Name of the Azure Open AI service
+      AIO_CLUSTER_NAME: ""                  # Name of the Azure IoT Operations Cluster you want to deploy
+      ```
    - Open a browser and navigate to the [Azure Portal](https://portal.azure.com/)
    - Use the [Azure Cloud Shell (**Bash**)](https://learn.microsoft.com/en-us/azure/cloud-shell/get-started/ephemeral?tabs=azurecli#start-cloud-shell)
-   - Set Environment Variables for services to create in Azure:
+   - Once the variables defined in file `variables.yaml`, upload the files `variables.yaml` and `1_cloud-provision.yaml` via `Manage files` > `Upload`. 
+   - Execute the playbook in Azure Cloud Shell to provision Azure Cloud resources
      ```bash
-     export SUBSCRIPTION_ID="<YOUR_SUBSCRIPTION_ID>"
-     export LOCATION="<YOUR_REGION>"
-     export RESOURCE_GROUP="<YOUR_RESOURCE_GROUP>"
-     export STORAGE_ACCOUNT_NAME="<YOUR_STORAGE_ACCOUNT_NAME>"
-     export SCHEMA_REGISTRY_NAME="<YOUR_SCHEMA_REGISTRY_NAME>"
-     export SCHEMA_REGISTRY_NAMESPACE="<YOUR_SCHEMA_REGISTRY_NAMESPACE>"
-     export EVENTHUB_NAMESPACE="<YOUR_EVENTHUB_NAMESPACE>"
-     export EVENTHUB_NAME="<YOUR_EVENTHUB_NAME>"
-     export AZURE_OPENAI_NAME="<YOUR_AZURE_OPENAI_NAME>"
+     ansible-playbook 1_cloud-provision.yaml
      ```
-     > **NOTE(1)**: keep a note of the environment variables for future use.
-   - Set Azure Subscription context:
-     ```bash
-     az account set --subscription $SUBSCRIPTION_ID
-     ```
-   - Create a service principal (service account) to manage Azure from the Edge Gateway running Azure IoT Operations:
-     ```bash
-     SPN=$(az ad sp create-for-rbac --name AIO_SP_Contrib --role Contributor --scopes /subscriptions/$SUBSCRIPTION_ID)
-     ```
-      > **NOTE(2)**: create 3 variables with: `appId`, `password` and `tenant`, from the output of the command, and **keep a note of them for future use**.
-     ```bash
-     export APP_ID=$(echo $SPN | jq -r .appId)
-     export APP_SECRET=$(echo $SPN | jq -r .password)
-     export TENANT=$(echo $SPN | jq -r .tenant)
-     ```
-   - Create a service principal (service account) for the Factory Assistant:
-     ```bash
-     SPN2=$(az ad sp create-for-rbac --name GenAI_Factory_Assistant)
-     ```
-      > **NOTE(2)**: create 2 variables with: `appId` and `password`, from the output of the command, and **keep a note of them for future use**.
-     ```bash
-     export ASSISTANT_APP_ID=$(echo $SPN2 | jq -r .appId)
-     export ASSISTANT_APP_SECRET=$(echo $SPN2 | jq -r .password)
-     ```
-   - Get `objectId` of `Microsoft Entra ID` application and create 1 variable:
-     ```bash
-     export OBJECT_ID=$(az ad sp show --id bc313c14-388c-4e7d-a58e-70017303ee3b --query id --output tsv)
-     ```
-   - Register required Resource Providers (execute this step only once per subscription):
-     ```bash
-      az provider register -n "Microsoft.ExtendedLocation"
-      az provider register -n "Microsoft.Kubernetes"
-      az provider register -n "Microsoft.KubernetesConfiguration"
-      az provider register -n "Microsoft.IoTOperations"
-      az provider register -n "Microsoft.DeviceRegistry"
-      az provider register -n "Microsoft.SecretSyncController"
-     ```
-   - Create a Resource Group:
-     ```bash
-     az group create --location $LOCATION --resource-group $RESOURCE_GROUP --subscription $SUBSCRIPTION_ID
-     ```
-   - Assign role to the service principal `SPN`
+   - You should see the following when the playbook has finished successfully:  
+    ![ansible-prov-cloud-1](./artifacts/media/ansible-prov-cloud-1.png "ansible-prov-cloud-1")  
+    ![ansible-prov-cloud-2](./artifacts/media/ansible-prov-cloud-2.png "ansible-prov-cloud-2")
+   - Now, open the `variables.yaml` file. It should contain new information (BEGIN/END ANSIBLE MANAGED BLOCK):
       ```bash
-      az role assignment create --assignee $APP_ID --role "Role Based Access Control Administrator" --scope subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP
+      # BEGIN ANSIBLE MANAGED BLOCK
+      AIO_SP_APPID: "***"
+      AIO_SP_SECRET: "***"
+      AIO_SP_TENANT: "***"
+      FACTORY_AGENT_SP_APPID: "***"
+      FACTORY_AGENT_SP_SECRET: "***"
+      ARC_OBJECT_ID: "***"
+      SCHEMA_REGISTRY_ID: "***"
+      KEYVAULT_ID: "***"
+      AIO_MANAGED_IDENTITY_SECRETS_ID: "***"
+      AIO_MANAGED_IDENTITY_COMPONENTS_ID: "***"
+      EVENTHUB_ID: "***"
+      # END ANSIBLE MANAGED BLOCK
       ```
-   - Create a storage account with `hierarchical namespace enabled`:
-     ```bash
-     az storage account create --name $STORAGE_ACCOUNT_NAME --resource-group $RESOURCE_GROUP --enable-hierarchical-namespace
-     ```
-   - Install `Azure IoT Operations extension`:
-      ```bash
-      az extension add --name azure-iot-ops --version 1.0.0
-      ```
-   - Create a schema registry that connects to your storage account:
-     ```bash
-     az iot ops schema registry create --name $SCHEMA_REGISTRY_NAME --resource-group $RESOURCE_GROUP --registry-namespace $SCHEMA_REGISTRY_NAMESPACE --sa-resource-id $(az storage account show --name $STORAGE_ACCOUNT_NAME --resource-group $RESOURCE_GROUP -o tsv --query id)
-     ```
-   - Create an Event Hub name space:
-     ```bash
-     az eventhubs namespace create --name $EVENTHUB_NAMESPACE --resource-group $RESOURCE_GROUP --location $LOCATION
-     ```
-   - Create an Event Hub:
-     ```bash
-     az eventhubs eventhub create --name $EVENTHUB_NAME --resource-group $RESOURCE_GROUP --namespace-name $EVENTHUB_NAMESPACE
-     ```
-   - Retrieve the Event Hub Connection String and create 2 variables:
-     ```bash
-     EVENTHUB_KEY_CREATE=$(az eventhubs namespace authorization-rule create --resource-group $RESOURCE_GROUP --namespace-name $EVENTHUB_NAMESPACE --name Listen --rights Listen)
-     EVENTHUB_KEY_INFO=$(az eventhubs namespace authorization-rule keys list --resource-group $RESOURCE_GROUP --namespace-name $EVENTHUB_NAMESPACE --name Listen)
-     export EVENTHUB_KEYNAME=$(echo $EVENTHUB_KEY_INFO | jq -r .keyName)
-     export EVENTHUB_KEY=$(echo $EVENTHUB_KEY_INFO | jq -r .primaryKey)
-     ```
-   - Create an Azure OpenAI resource:
-     ```bash
-     az cognitiveservices account create --name $AZURE_OPENAI_NAME --resource-group $RESOURCE_GROUP --location eastus --kind OpenAI --sku s0 --subscription $SUBSCRIPTION_ID
-     ```
-   - Retrieve the Azure OpenAI resource keys and create 1 variable:
-     ```bash
-     export AZURE_OPENAI_KEY=$(az cognitiveservices account keys list --name $AZURE_OPENAI_NAME --resource-group $RESOURCE_GROUP --query key1 --output tsv)
-     ```
-#### Prepare and provision Edge platform
+   - Download the file `variables.yaml` via `Manage files` > `Download`.
+   - Copy the file `variables.yaml` to your Edge Cluster.
+   - You should now see the following resources in Azure (including hidden types):  
+    ![azure-deployed-1](./artifacts/media/azure-deployed-1.png "azure-deployed-1")
+      
+## Prepare and provision Edge Cluster
 
 - Hardware requirements
   - **Resources**: 
@@ -103,91 +59,69 @@
       - Memory: `16GB`
       - Storage: `30GB`
 
-  - **Operating System**: the solution requires a Linux-based system, specifically a VM or physical machine running `Linux Ubuntu 22.04` or `Linux Ubuntu 24.04`. This system will perform as an Edge server, handling queries directly from the production line and interfacing with other operational systems.
+  - **Operating System**: the solution requires a Linux-based system, specifically a VM or physical machine running `Linux Ubuntu 22.04` or `Linux Ubuntu 24.04`. This system will perform as an Edge Cluster, handling queries directly from the production line and interfacing with other operational systems.
 
-- Option A (Virtual Machine in Azure)
+- Option A (Virtual Machine in Azure Cloud)
    - If you want to use a Virtual Machine in Azure, you can deploy it using the Deploy button below:  
-      [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fchriscrcodes%2Fsmart-factory%2Frefs%2Fheads%2Fmain%2Fartifacts%2Ftemplates%2Fvm%2Fazuredeploy.json)
-      - `Review + create` > `Create`
-
+      [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fchriscrcodes%2Fsmart-factory%2Frefs%2Fheads%2Fmain%2Fartifacts%2Ftemplates%2Fdeploy%2Fazure-vm.json)  
+        ![azure-deployed-2](./artifacts/media/azure-deployed-2.png "azure-deployed-2")
+    - Fill the required information and click `Review + create` > `Create`
       > **Note**: `Standard_D4s_v3` is the recommended size for the Azure VM.
 
 - Option B (your own Industrial PC or Virtual Machine)
   - Install `Linux Ubuntu 22.04` or `Linux Ubuntu 24.04`
 
-- Prepare a K3s Kubernetes Cluster on Ubuntu (login and execute the following commands on your Ubuntu Machine)
-   - Install `curl` and `nano`:
-     ```bash
-     sudo apt update
-     sudo apt install curl nano -y
-     ```
-- Install K3s
-   - Run the `K3s installation script`:
-     ```bash
-     curl -sfL https://get.k3s.io | sh -
-     ```
-   - Create a `K3s configuration` file in `.kube/config`:
-     ```bash
-     mkdir ~/.kube
-     sudo KUBECONFIG=~/.kube/config:/etc/rancher/k3s/k3s.yaml kubectl config view --flatten > ~/.kube/merged
-     mv ~/.kube/merged ~/.kube/config
-     chmod  0600 ~/.kube/config
-     export KUBECONFIG=~/.kube/config
-     kubectl config use-context default
-     ```
-   - Increase user watch/instance limits:
-     ```bash
-     echo fs.inotify.max_user_instances=8192 | sudo tee -a /etc/sysctl.conf
-     echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf
-     sudo sysctl -p
-     ```
-   - Increase file descriptor limit:
-     ```bash
-     echo fs.file-max = 100000 | sudo tee -a /etc/sysctl.conf
-     sudo sysctl -p
-     ```
-- Check K3s installation
-  ```bash
-  kubectl get node
-  ```
-- Install k9s
+- Copy the file `variables.yaml` to your Edge Cluster
+- Login and execute the following commands on your Edge Cluster
+    - Install `Ansible`:
+      ```bash
+      sudo apt update && sudo apt install ansible -y
+      ```
+    - Execute the playbook to prepare your Edge Cluster
+      ```bash
+      curl -O https://raw.githubusercontent.com/chriscrcodes/talk-to-your-factory/main/artifacts/templates/deploy/2_edge-prepare.yaml
+      ansible-playbook 2_edge-prepare.yaml
+      ```
+      ![edge-deployed-1](./artifacts/media/edge-deployed-1.png "edge-deployed-1")
+    - Execute the playbook to install Azure IoT Operations to your Edge Cluster
+      ```bash
+      curl -O https://raw.githubusercontent.com/chriscrcodes/talk-to-your-factory/main/artifacts/templates/deploy/3_edge-install_aio.yaml
+      ansible-playbook 3_edge-install_aio.yaml
+      ```
+      ![edge-deployed-2](./artifacts/media/edge-deployed-2.png "edge-deployed-2")
+    - Execute the playbook to configure Azure IoT Operations
+      ```bash
+      curl -O https://raw.githubusercontent.com/chriscrcodes/talk-to-your-factory/main/artifacts/templates/deploy/4_edge-configure_aio.yaml
+      ansible-playbook 4_edge-configure_aio.yaml
+      ```
+      ![edge-deployed-3](./artifacts/media/edge-deployed-3.png "edge-deployed-3")
+    - You should now see the following additional resources in Azure (Azure Arc Cluster and Azure IoT Operations instance):  
+    ![azure-deployed-3](./artifacts/media/azure-deployed-3.png "azure-deployed-3")
+
+## Confirm Factory Simulator is running on the Edge Cluster
+  - Deploy MQTT Client
     ```bash
-    sudo snap install k9s
-    alias k9s=/snap/k9s/current/bin/k9s
-    echo "alias k9s=/snap/k9s/current/bin/k9s" >> ~/.bashrc
-    ```
-    > Note: you can browse pods using the following command: k9s -n azure-iot-operations
-- Install Azure prerequisites
-  - Install `Azure CLI`:
-    ```bash
-    curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-    ```
-  - Install `Azure arc extension`:
-    ```bash
-    az extension add --name connectedk8s --version 1.10.3
-    ```
-  - Install `Azure IoT Operations extension`:
-    ```bash
-    az extension add --name azure-iot-ops --version 1.0.0
+    kubectl apply -f https://raw.githubusercontent.com/chriscrcodes/talk-to-your-factory/main/artifacts/templates/k3s/pods/mqtt-client/pod.yaml
     ```
 
-- Prepare your Cluster for Azure IoT Operations
-   - Check [Azure IoT Operations prerequisites](https://learn.microsoft.com/en-us/azure/iot-operations/deploy-iot-ops/howto-deploy-iot-operations?tabs=cli#prerequisites)
-
-   - Validate Cluster readiness for Azure IoT Operations:
-     ```bash
-     az iot ops verify-host     
-     ```
-
-      ![az-iot-ops-verify-host](./artifacts/media/az-iot-ops-verify-host.png "az-iot-ops-verify-host")
-
-- Validate Azure IoT Operations pre-deployment checks  
-    - Before the deployment, use `az iot ops check` to execute IoT Operations pre-deployment checks.  
-
+  - Connect to the container running the MQTT client
     ```bash
-    az iot ops check
+    kubectl exec --stdin --tty mqtt-client -n azure-iot-operations -- sh
     ```
+  - From within the container, launch the MQTT client:
+    ```bash
+    mqttui --broker mqtt://aio-broker-insecure:1883 --insecure
+    ```
+  - Confirm if the 2 following topics are present:
+    - `LightningCars` (data coming from the Factory Simulator)
+    - `Silver` (data coming from Azure IoT Operations Data flows)  
 
-    ![az-iot-ops-check-pre](./artifacts/media/az-iot-ops-check-pre.png "az-iot-ops-check-pre")
-      
-- ✅ **You can now continue to** > [Part 2 - Connect your Edge platform to Cloud platform](./INSTALL-2.md)
+    ![MQTT Broker Client](./artifacts/media/mqttui.png "MQTT Broker Client")
+
+## Confirm Data is flowing from Edge (Azure IoT Operations) to Cloud (Azure Event Hub)
+  - Locate the Azure Event Hub Namespace you created in [Azure Portal](https://portal.azure.com/)
+  - Data Explorer (preview) > select the event hub you created in [Step 1](#step-1---provision-azure-resources) (`EVENTHUB_NAME` variable)
+  - Click on `View events` > and select an event on the right to confirm data flow is operational  
+  ![evh-messages](./artifacts/media/evh-messages.png "evh-messages")
+
+- ✅ **You can now continue to** > [Part 2 - Configure the solution in Microsoft Fabric](./INSTALL-2.md)

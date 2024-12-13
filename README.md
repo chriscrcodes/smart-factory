@@ -32,7 +32,7 @@ From `Bronze` (Edge: MQTT Data Simulator) ⇒ `Silver` (Edge: Azure IoT Operatio
     Factory simulator is publishing data to an Message Queuing Telemetry Transport (MQTT) broker topic based on the international standard from the International Society of Automation known as 'ISA-95' with the following format: Enterprise/Site/Area/Line/Cell.  
     Industrial machines involved in the process are 'Cells.'  
 
-    > Messages are published following the **UNS (Unified Name Space) Architecture**.  
+    > Messages are published following the **UNS (Unified Namespace) Architecture**.  
     The UNS is a method of organizing and structuring data in a way that makes it accessible and meaningful across an entire enterprise.  
     ![UNS](./artifacts/media/UNS.png "UNS")
 
@@ -95,26 +95,29 @@ Microsoft Documentation: [Azure IoT Operations prerequisites](https://learn.micr
 
  - [`K3s`](https://k3s.io/) Lightweight Kubernetes. Easy to install, half the memory, all in a binary of less than 100 MB.
  - [`python >=v3.10`](https://www.python.org/) Programming Language
- - [`curl`](https://curl.se/) command line tool that developers use to transfer data to and from a server.
- - [`nano`](https://www.nano-editor.org/) text editor.
  - [`Azure CLI`](https://learn.microsoft.com/en-us/cli/azure/) the Azure command-line interface.
+ - [`Ansible`](https://www.ansible.com/) open source IT automation engine that automates provisioning and configuration of the solution.
 
 ### Cloud services requirements
 
  - Azure Subscription (with Contributor rights)
+ - The solution will deploy the following resources:
     - Resource Group
     - Storage Account
+    - Schema Registry
     - Event Hub
     - Azure Open AI Service
+    - 2 Managed Identities
     - _Optional_: Virtual Machine (if you want to test everything in Azure Cloud)
  - Microsoft Fabric Tenant (you can try it for free [here](https://www.microsoft.com/en-us/microsoft-fabric/getting-started?msockid=27cd43526f4e6b2a1fa857d06e486a3c))
 
 ## Solution build steps
 
+Deploy the solution in 3 steps!
+
 ### 1. [Provision resources (Edge and Cloud)](./INSTALL-1.md)
-### 2. [Connect your Edge platform to Cloud platform](./INSTALL-2.md)
-### 3. [Configure the solution (Cloud part)](./INSTALL-3.md)
-### 4. [Deploy and use the Generative AI Factory Agent](./INSTALL-4.md)
+### 2. [Configure the solution (Cloud part)](./INSTALL-2.md)
+### 3. [Deploy and use the Generative AI Factory Agent](./INSTALL-3.md)
 
 ## Demo
 

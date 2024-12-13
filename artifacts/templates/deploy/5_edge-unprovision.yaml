@@ -1,0 +1,35 @@
+---
+- name: Unprovision Edge Resources
+  hosts: localhost
+  become: true
+  gather_facts: no
+  vars_files:
+    - variables.yaml
+
+  tasks:
+    - name: Connecting to Azure subscription
+      ansible.builtin.shell: |
+        az login --service-principal --username "{{ AIO_SP_APPID }}" --password "{{ AIO_SP_SECRET }}" --tenant "{{ AIO_SP_TENANT }}"
+        az account set --subscription "{{ SUBSCRIPTION_ID }}"
+
+    - name: Delete the cloud connector
+      ansible.builtin.shell: kubectl delete -f /tmp/silver-to-cloud.yaml
+
+    - name: Delete Factory Simulator - bronze to silver
+      ansible.builtin.shell: kubectl delete -f https://raw.githubusercontent.com/chriscrcodes/talk-to-your-factory/main/artifacts/templates/azure-iot-operations/dataflows/bronze-to-silver.yaml
+
+    - name: Delete Factory Simulator - deployment
+      ansible.builtin.shell: kubectl delete -f https://raw.githubusercontent.com/chriscrcodes/talk-to-your-factory/main/artifacts/templates/k3s/pods/simulator/deployment.yaml
+
+    - name: Delete Factory Simulator - configuration
+      ansible.builtin.shell: kubectl delete -f https://raw.githubusercontent.com/chriscrcodes/talk-to-your-factory/main/artifacts/templates/k3s/pods/simulator/configuration.yaml
+
+    - name: Delete Azure IoT Operations instance
+      ansible.builtin.shell: az iot ops delete --yes --name "{{ AIO_CLUSTER_NAME }}"-ops-instance --resource-group "{{ RESOURCE_GROUP }}" --include-deps
+
+    - name: Delete Azure Arc connected cluster
+      ansible.builtin.shell: az connectedk8s delete --yes --name "{{ AIO_CLUSTER_NAME }}" --resource-group "{{ RESOURCE_GROUP }}"
+
+    - name: Uninstall k3s
+      ansible.builtin.shell: |
+        /usr/local/bin/k3s-uninstall.sh
