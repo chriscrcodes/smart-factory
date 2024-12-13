@@ -1,0 +1,57 @@
+---
+- name: Install Azure IoT Operations
+  hosts: localhost
+  become: true
+  gather_facts: no
+  vars_files:
+    - variables.yaml
+
+  tasks:
+    - name: Connect to Azure subscription
+      ansible.builtin.shell: |
+        az login --service-principal --username "{{ AIO_SP_APPID }}" --password "{{ AIO_SP_SECRET }}" --tenant "{{ AIO_SP_TENANT }}"
+        az account set --subscription "{{ SUBSCRIPTION_ID }}"
+
+    - name: Connect Edge cluster to Azure Arc
+      ansible.builtin.shell: >
+        az connectedk8s connect --name "{{ AIO_CLUSTER_NAME }}" --location "{{ LOCATION }}" --resource-group "{{ RESOURCE_GROUP }}" --subscription "{{ SUBSCRIPTION_ID }}" --enable-oidc-issuer --enable-workload-identity --disable-auto-upgrade
+
+    - name: Configuring Arc custom location
+      ansible.builtin.shell: >
+        az connectedk8s enable-features --name "{{ AIO_CLUSTER_NAME }}" --resource-group "{{ RESOURCE_GROUP }}" --custom-locations-oid "{{ ARC_OBJECT_ID }}" --features cluster-connect custom-locations
+      register: az_arc_enable_cl
+
+    - name: Retrieve OIDC Issuer Profile
+      ansible.builtin.shell: >
+        az connectedk8s show --resource-group "{{ RESOURCE_GROUP }}" --name "{{ AIO_CLUSTER_NAME }}" --query oidcIssuerProfile.issuerUrl --output tsv
+      register: oidc_issuer_profile
+
+    - name: Configure K3s
+      ansible.builtin.shell: |
+        sudo touch /etc/rancher/k3s/config.yaml
+        sudo bash -c 'cat <<EOL > /etc/rancher/k3s/config.yaml
+        kube-apiserver-arg:
+         - service-account-issuer={{ oidc_issuer_profile.stdout }}
+         - service-account-max-token-expiration=24h
+        EOL'
+        sudo systemctl restart k3s
+        sudo k3s check-config
+
+    - name: Check Azure IoT Operations prerequisites
+      ansible.builtin.shell: az iot ops check
+
+    - name: Initialize Azure IoT Operations foundations installation
+      ansible.builtin.shell: >
+        az iot ops init --subscription "{{ SUBSCRIPTION_ID }}" --cluster "{{ AIO_CLUSTER_NAME }}" --resource-group "{{ RESOURCE_GROUP }}"
+
+    - name: Install Azure IoT Operations
+      ansible.builtin.shell: >
+        az iot ops create --add-insecure-listener --kubernetes-distro K3s --name "{{ AIO_CLUSTER_NAME }}"-ops-instance --cluster "{{ AIO_CLUSTER_NAME }}" --resource-group "{{ RESOURCE_GROUP }}" --sr-resource-id "{{ SCHEMA_REGISTRY_ID }}" --broker-frontend-replicas 1 --broker-frontend-workers 1 --broker-backend-part 1 --broker-backend-workers 1 --broker-backend-rf 2 --broker-mem-profile Low
+
+    - name: Enable secret sync
+      ansible.builtin.shell: >
+        az iot ops secretsync enable --instance "{{ AIO_CLUSTER_NAME }}"-ops-instance --resource-group "{{ RESOURCE_GROUP }}" --mi-user-assigned "{{ AIO_MANAGED_IDENTITY_SECRETS_ID }}" --kv-resource-id "{{ KEYVAULT_ID }}"
+
+    - name: Enable cloud connections sync
+      ansible.builtin.shell: >
+        az iot ops identity assign --name "{{ AIO_CLUSTER_NAME }}"-ops-instance --resource-group "{{ RESOURCE_GROUP }}" --mi-user-assigned "{{ AIO_MANAGED_IDENTITY_COMPONENTS_ID }}"
