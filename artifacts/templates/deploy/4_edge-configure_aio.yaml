@@ -46,10 +46,10 @@
         replace: "{{ EVENTHUB_NAME }}"
 
     - name: Import the operators dataset in the Distributed State Store
-      ansible.builtin.shell: /tmp/dss_set --key operators --file "operators.json" --address localhost
+      ansible.builtin.shell: /tmp/dss_set --key operators --file "/tmp/operators.json" --address localhost
 
     - name: Import the products dataset in the Distributed State Store
-      ansible.builtin.shell: /tmp/dss_set --key products --file "products.json" --address localhost
+      ansible.builtin.shell: /tmp/dss_set --key products --file "/tmp/products.json" --address localhost
 
     - name: Deploy Factory Simulator - configuration
       ansible.builtin.shell: kubectl apply -f https://raw.githubusercontent.com/chriscrcodes/talk-to-your-factory/main/artifacts/templates/k3s/pods/simulator/configuration.yaml
