@@ -30,7 +30,7 @@
    - You should see the following when the playbook has finished successfully:  
     ![ansible-prov-cloud-1](./artifacts/media/ansible-prov-cloud-1.png "ansible-prov-cloud-1")  
     ![ansible-prov-cloud-2](./artifacts/media/ansible-prov-cloud-2.png "ansible-prov-cloud-2")
-   - Now, open the `variables.yaml` file. It should contain new information (BEGIN/END ANSIBLE MANAGED BLOCK):
+   - Now, open the `variables.yaml` file. It should contain new information at the end (BEGIN/END ANSIBLE MANAGED BLOCK):
       ```bash
       # BEGIN ANSIBLE MANAGED BLOCK
       AIO_SP_APPID: "***"
@@ -67,6 +67,8 @@
         ![azure-deployed-2](./artifacts/media/azure-deployed-2.png "azure-deployed-2")
     - Fill the required information and click `Review + create` > `Create`
       > **Note**: `Standard_D4s_v3` is the recommended size for the Azure VM.
+   - You should now see the following resources in Azure (including hidden types):  
+    ![azure-deployed-2-2](./artifacts/media/azure-deployed-2-2.png "azure-deployed-2-2")
 
 - Option B (your own Industrial PC or Virtual Machine)
   - Install `Linux Ubuntu 22.04` or `Linux Ubuntu 24.04`
@@ -89,14 +91,14 @@
       ansible-playbook 3_edge-install_aio.yaml
       ```
       ![edge-deployed-2](./artifacts/media/edge-deployed-2.png "edge-deployed-2")
+    - You should now see the following additional resources in Azure (Azure Arc Cluster and Azure IoT Operations instance):  
+    ![azure-deployed-3](./artifacts/media/azure-deployed-3.png "azure-deployed-3")
     - Execute the playbook to configure Azure IoT Operations
       ```bash
       curl -O https://raw.githubusercontent.com/chriscrcodes/talk-to-your-factory/main/artifacts/templates/deploy/4_edge-configure_aio.yaml
       ansible-playbook 4_edge-configure_aio.yaml
       ```
       ![edge-deployed-3](./artifacts/media/edge-deployed-3.png "edge-deployed-3")
-    - You should now see the following additional resources in Azure (Azure Arc Cluster and Azure IoT Operations instance):  
-    ![azure-deployed-3](./artifacts/media/azure-deployed-3.png "azure-deployed-3")
 
 ## Confirm Factory Simulator is running on the Edge Cluster
   - Deploy MQTT Client
