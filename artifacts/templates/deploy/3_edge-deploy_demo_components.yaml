@@ -7,10 +7,48 @@
     - variables.yaml
 
   tasks:
+    - name: Connect to Azure subscription
+      ansible.builtin.shell: |
+        az login --service-principal --username "{{ AIO_SP_APPID }}" --password "{{ AIO_SP_SECRET }}" --tenant "{{ TENANT }}"
+        az account set --subscription "{{ SUBSCRIPTION_ID }}"
+
+    - name: Creating Service Principal for the Factory Agent
+      ansible.builtin.shell: az ad sp create-for-rbac --name "{{ FACTORY_AGENT_SERVICE_PRINCIPAL }}" --role Reader --scopes "/subscriptions/{{ SUBSCRIPTION_ID }}/resourceGroups/{{ RESOURCE_GROUP }}"
+      register: factory_agent_sp
+
+    - name: Create Event Hub namespace
+      ansible.builtin.shell: az eventhubs namespace create --name "{{ EVENTHUB_NAMESPACE }}" --resource-group "{{ RESOURCE_GROUP }}" --location "{{ LOCATION }}"
+
+    - name: Create Event Hub
+      ansible.builtin.shell: az eventhubs eventhub create --name "{{ EVENTHUB_NAME }}" --resource-group "{{ RESOURCE_GROUP }}" --namespace-name "{{ EVENTHUB_NAMESPACE }}"
+      register: eventhub
+
+    - name: Create Event Hub authorization rule
+      ansible.builtin.shell: az eventhubs eventhub authorization-rule create --resource-group "{{ RESOURCE_GROUP }}" --namespace-name "{{ EVENTHUB_NAMESPACE }}" --eventhub-name "{{ EVENTHUB_NAME }}" --name Listen --rights Listen
+
+    - name: Retrieve Event Hub connection key
+      ansible.builtin.shell: az eventhubs eventhub authorization-rule keys list --resource-group "{{ RESOURCE_GROUP }}" --namespace-name "{{ EVENTHUB_NAMESPACE }}" --eventhub-name "{{ EVENTHUB_NAME }}" --name Listen --query primaryKey --output tsv
+      register: eventhub_key
+
+    - name: Insert variables information in variables.yaml file
+      ansible.builtin.blockinfile:
+        path: ./variables.yaml
+        block: |
+          FACTORY_AGENT_SP_APPID: "{{ factory_agent_sp.stdout | from_json | json_query('appId') }}"
+          FACTORY_AGENT_SP_SECRET: "{{ factory_agent_sp.stdout | from_json | json_query('password') }}"
+          EVENTHUB_ID: "{{ eventhub.stdout | from_json | json_query('id') }}"
+          EVENTHUB_KEY: "{{ eventhub_key.stdout }}"
+
     - name: Authorize Azure IoT Operations to send messages to Event Hub
       ansible.builtin.shell: |
         AZ_AIO_EXT=$(az k8s-extension list --cluster-name "{{ AIO_CLUSTER_NAME }}" --resource-group "{{ RESOURCE_GROUP }}" --cluster-type connectedClusters --query "[?extensionType=='microsoft.iotoperations'].identity.principalId" --output tsv)
         az role assignment create --assignee $AZ_AIO_EXT --role "Azure Event Hubs Data Sender" --scope "{{ EVENTHUB_ID }}"
+
+    - name: Create Azure Open AI Service
+      ansible.builtin.shell: az cognitiveservices account create --name "{{ AZURE_OPENAI_NAME }}" --resource-group "{{ RESOURCE_GROUP }}" --location "eastus" --kind OpenAI --sku s0 --subscription "{{ SUBSCRIPTION_ID }}"
+
+    - name: Deploy gpt4-o model
+      ansible.builtin.shell: az cognitiveservices account deployment create --resource-group "{{ RESOURCE_GROUP }}" --name "{{ AZURE_OPENAI_NAME }}" --deployment-name "gpt-4o" --model-name "gpt-4o" --model-version "2024-08-06" --model-format OpenAI --sku-capacity 1 --sku-name "Standard"
 
     - name: Download the Distributed State Store tool
       ansible.builtin.get_url:
