@@ -15,9 +15,9 @@
       AIO_MANAGED_IDENTITY_COMPONENTS: ""   # Name of the Managed Identity for Azure IoT Operations components
       AIO_SCHEMA_REGISTRY_NAMESPACE: ""     # Name of the Schema Registry. Valid Characters: lowercase letters and numbers.
       AIO_CLUSTER_NAME: ""                  # Name of the Azure IoT Operations Cluster you want to deploy
-      FACTORY_AGENT_SERVICE_PRINCIPAL: ""   # Name of the Service Principal (service account) for the Factory Agent
       EVENTHUB_NAMESPACE: ""                # Name of the Event Hub Namespace
       EVENTHUB_NAME: ""                     # Name of the Event Hub inside the Event Hub Namespace
+      FACTORY_AGENT_SERVICE_PRINCIPAL: ""   # Name of the Service Principal (service account) for the Factory Agent
       AZURE_OPENAI_NAME: ""                 # Name of the Azure Open AI service
       ```
    - Open a browser and navigate to the [Azure Portal](https://portal.azure.com/)
@@ -28,24 +28,31 @@
      ansible-playbook 1_cloud-provision.yaml
      ```
    - You should see the following when the playbook has finished successfully:
-    ![ansible-prov-cloud-1](./artifacts/media/ansible-prov-cloud-1.png "ansible-prov-cloud-1")
+    ![ansible-prov-cloud-1](./artifacts/media/ansible-prov-cloud-1.png "ansible-prov-cloud-1")  
+    ![ansible-prov-cloud-2](./artifacts/media/ansible-prov-cloud-2.png "ansible-prov-cloud-2")
    - Now, open the `variables.yaml` file. It should contain additional information at the end (BEGIN/END ANSIBLE MANAGED BLOCK):
       ```bash
       # BEGIN ANSIBLE MANAGED BLOCK
-      AIO_SP_APPID: "***"
-      AIO_SP_SECRET: "***"
-      AIO_SCHEMA_REGISTRY_ID: "***"
-      AIO_MANAGED_IDENTITY_SECRETS_ID: "***"
-      AIO_MANAGED_IDENTITY_COMPONENTS_ID: "***"
-      TENANT: "***"
-      ARC_OBJECT_ID: "***"
-      KEYVAULT_ID: "***"
+      AIO_SP_APPID: ""
+      AIO_SP_SECRET: ""
+      AIO_SCHEMA_REGISTRY_ID: ""
+      AIO_MANAGED_IDENTITY_SECRETS_ID: ""
+      AIO_MANAGED_IDENTITY_COMPONENTS_ID: ""
+      TENANT: ""
+      ARC_OBJECT_ID: ""
+      KEYVAULT_ID: ""
+      FACTORY_AGENT_SP_APPID: ""
+      FACTORY_AGENT_SP_SECRET: ""
+      EVENTHUB_ID: ""
+      EVENTHUB_KEY: ""
       # END ANSIBLE MANAGED BLOCK
       ```
    - Download the file `variables.yaml` via `Manage files` > `Download` > type `variables.yaml` > `Download`.
    - Copy the file `variables.yaml` to your Edge Cluster.
-   - You should now see the following new resources in Azure (including hidden types):
+   - You should now see the following new resources in your Azure Resource Group (including hidden types):  
     ![azure-deployed-1](./artifacts/media/azure-deployed-1.png "azure-deployed-1")
+   - You should now see the following 2 new App registrations in your Azure Entra ID:  
+    ![azure-deployed-1-1](./artifacts/media/azure-deployed-1-1.png "azure-deployed-1-1")
 
 ## Prepare and provision Edge Cluster
 
@@ -55,19 +62,19 @@
       - Memory: `16GB`
       - Storage: `30GB`
 
-  - **Operating System**: the solution requires a Linux-based system, specifically a VM or physical machine running `Linux Ubuntu 22.04` or `Linux Ubuntu 24.04`. This system will perform as an Edge Cluster, handling queries directly from the production line and interfacing with other operational systems.
+  - **Operating System**: the solution requires a Linux-based system, specifically a VM or physical machine running `Linux Ubuntu 24.04`. This system will perform as an Edge Cluster, handling queries directly from the production line and interfacing with other operational systems.
 
 - Option A (Virtual Machine in Azure Cloud)
-   - If you want to use a Virtual Machine in Azure, you can deploy it using the Deploy button below:
-      [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fchriscrcodes%2Fsmart-factory%2Frefs%2Fheads%2Fmain%2Fartifacts%2Ftemplates%2Fdeploy%2Fazure-vm.json)
+   - If you want to use a Virtual Machine in Azure, you can deploy it using the Deploy button below:  
+      [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fchriscrcodes%2Fsmart-factory%2Frefs%2Fheads%2Fmain%2Fartifacts%2Ftemplates%2Fdeploy%2Fazure-vm.json)  
         ![azure-deployed-2](./artifacts/media/azure-deployed-2.png "azure-deployed-2")
     - Fill the required information and click `Review + create` > `Create`
       > **Note**: `Standard_D4s_v3` is the recommended size for the Azure VM.
-   - You should now see the following new resources in Azure, if you deployed a Virtual Machine in Azure (including hidden types):
+   - You should now see the following new resources in your Azure Resource Group (including hidden types):
     ![azure-deployed-2-2](./artifacts/media/azure-deployed-2-2.png "azure-deployed-2-2")
 
 - Option B (your own Industrial PC or Virtual Machine)
-  - Install `Linux Ubuntu 22.04` or `Linux Ubuntu 24.04`
+  - Install `Linux Ubuntu 24.04`
 
 - Copy the file `variables.yaml` to your Edge Cluster (in your home user directory)
 - Login and execute the following commands on your Edge Cluster
@@ -80,9 +87,9 @@
       curl -O https://raw.githubusercontent.com/chriscrcodes/talk-to-your-factory/main/artifacts/templates/deploy/2_edge-install_aio.yaml
       ansible-playbook 2_edge-install_aio.yaml
       ```
-      ![edge-deployed-1](./artifacts/media/edge-deployed-1.png "edge-deployed-1")  
+      ![edge-deployed-1](./artifacts/media/edge-deployed-1.png "edge-deployed-1")
       ![edge-deployed-2](./artifacts/media/edge-deployed-2.png "edge-deployed-2")
-    - You should now see the following additional resources in Azure (Azure Arc Cluster and Azure IoT Operations instance):
+    - You should now see the following additional resources in Azure:
     ![azure-deployed-3](./artifacts/media/azure-deployed-3.png "azure-deployed-3")
     - Execute the playbook to deploy demo components
       ```bash
@@ -90,12 +97,11 @@
       ansible-playbook 3_edge-deploy_demo_components.yaml
       ```
 
-## Confirm Factory Simulator is running on the Edge Cluster
+## Confirm Factory MQTT Simulator is running on the Edge Cluster
   - Deploy MQTT Client
     ```bash
     kubectl apply -f https://raw.githubusercontent.com/chriscrcodes/talk-to-your-factory/main/artifacts/templates/k3s/pods/mqtt-client/pod.yaml
     ```
-
   - Connect to the container running the MQTT client
     ```bash
     kubectl exec --stdin --tty mqtt-client -n azure-iot-operations -- sh
@@ -105,8 +111,8 @@
     mqttui --broker mqtt://aio-broker-insecure:1883 --insecure
     ```
   - Confirm if the 2 following topics are present:
-    - `LightningCars` (data coming from the Factory Simulator)
-    - `Silver` (data coming from Azure IoT Operations Data flows)
+    - `LightningCars` (data coming from the Factory MQTT Simulator)
+    - `Silver` (data coming from Azure IoT Operations 'bronze to silver' Data Flow)
 
     ![MQTT Broker Client](./artifacts/media/mqttui.png "MQTT Broker Client")
 

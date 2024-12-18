@@ -1,5 +1,5 @@
 ---
-- name: Configure Azure IoT Operations
+- name: Deploy demo components
   hosts: localhost
   become: true
   gather_facts: no
@@ -7,96 +7,53 @@
     - variables.yaml
 
   tasks:
-    - name: Connect to Azure subscription
-      ansible.builtin.shell: |
-        az login --service-principal --username "{{ AIO_SP_APPID }}" --password "{{ AIO_SP_SECRET }}" --tenant "{{ TENANT }}"
-        az account set --subscription "{{ SUBSCRIPTION_ID }}"
-
-    - name: Creating Service Principal for the Factory Agent
-      ansible.builtin.shell: az ad sp create-for-rbac --name "{{ FACTORY_AGENT_SERVICE_PRINCIPAL }}" --role Reader --scopes "/subscriptions/{{ SUBSCRIPTION_ID }}/resourceGroups/{{ RESOURCE_GROUP }}"
-      register: factory_agent_sp
-
-    - name: Create Event Hub namespace
-      ansible.builtin.shell: az eventhubs namespace create --name "{{ EVENTHUB_NAMESPACE }}" --resource-group "{{ RESOURCE_GROUP }}" --location "{{ LOCATION }}"
-
-    - name: Create Event Hub
-      ansible.builtin.shell: az eventhubs eventhub create --name "{{ EVENTHUB_NAME }}" --resource-group "{{ RESOURCE_GROUP }}" --namespace-name "{{ EVENTHUB_NAMESPACE }}"
-      register: eventhub
-
-    - name: Create Event Hub authorization rule
-      ansible.builtin.shell: az eventhubs eventhub authorization-rule create --resource-group "{{ RESOURCE_GROUP }}" --namespace-name "{{ EVENTHUB_NAMESPACE }}" --eventhub-name "{{ EVENTHUB_NAME }}" --name Listen --rights Listen
-
-    - name: Retrieve Event Hub connection key
-      ansible.builtin.shell: az eventhubs eventhub authorization-rule keys list --resource-group "{{ RESOURCE_GROUP }}" --namespace-name "{{ EVENTHUB_NAMESPACE }}" --eventhub-name "{{ EVENTHUB_NAME }}" --name Listen --query primaryKey --output tsv
-      register: eventhub_key
-
-    - name: Insert variables information in variables.yaml file
-      ansible.builtin.blockinfile:
-        path: ./variables.yaml
-        block: |
-          FACTORY_AGENT_SP_APPID: "{{ factory_agent_sp.stdout | from_json | json_query('appId') }}"
-          FACTORY_AGENT_SP_SECRET: "{{ factory_agent_sp.stdout | from_json | json_query('password') }}"
-          EVENTHUB_ID: "{{ eventhub.stdout | from_json | json_query('id') }}"
-          EVENTHUB_KEY: "{{ eventhub_key.stdout }}"
-
-    - name: Authorize Azure IoT Operations to send messages to Event Hub
-      ansible.builtin.shell: |
-        AZ_AIO_EXT=$(az k8s-extension list --cluster-name "{{ AIO_CLUSTER_NAME }}" --resource-group "{{ RESOURCE_GROUP }}" --cluster-type connectedClusters --query "[?extensionType=='microsoft.iotoperations'].identity.principalId" --output tsv)
-        az role assignment create --assignee $AZ_AIO_EXT --role "Azure Event Hubs Data Sender" --scope "{{ EVENTHUB_ID }}"
-
-    - name: Create Azure Open AI Service
-      ansible.builtin.shell: az cognitiveservices account create --name "{{ AZURE_OPENAI_NAME }}" --resource-group "{{ RESOURCE_GROUP }}" --location "eastus" --kind OpenAI --sku s0 --subscription "{{ SUBSCRIPTION_ID }}"
-
-    - name: Deploy gpt4-o model
-      ansible.builtin.shell: az cognitiveservices account deployment create --resource-group "{{ RESOURCE_GROUP }}" --name "{{ AZURE_OPENAI_NAME }}" --deployment-name "gpt-4o" --model-name "gpt-4o" --model-version "2024-08-06" --model-format OpenAI --sku-capacity 1 --sku-name "Standard"
-
     - name: Download the Distributed State Store tool
       ansible.builtin.get_url:
         url: https://raw.githubusercontent.com/chriscrcodes/talk-to-your-factory/main/artifacts/templates/azure-iot-operations/dataflows/dss/dss_set
         dest: /tmp/dss_set
         mode: '0755'
 
-    - name: Download the Operators Dataset
+    - name: Download the 'Operators' Dataset
       ansible.builtin.get_url:
         url: https://raw.githubusercontent.com/chriscrcodes/talk-to-your-factory/main/artifacts/templates/azure-iot-operations/dataflows/dss/operators.json
         dest: /tmp/operators.json
 
-    - name: Download the Products Dataset
+    - name: Download the 'Products' Dataset
       ansible.builtin.get_url:
         url: https://raw.githubusercontent.com/chriscrcodes/talk-to-your-factory/main/artifacts/templates/azure-iot-operations/dataflows/dss/products.json
         dest: /tmp/products.json
 
-    - name: Download the data flow
+    - name: Download the Data Flow 'Cloud Connector to Azure Event Hub'
       ansible.builtin.get_url:
         url: https://raw.githubusercontent.com/chriscrcodes/talk-to-your-factory/main/artifacts/templates/azure-iot-operations/dataflows/silver-to-cloud.yaml
         dest: /tmp/silver-to-cloud.yaml
 
-    - name: Modify file with the name of the event hub namespace
+    - name: Modify the Data Flow 'Cloud Connector to Azure Event Hub' with the name of the Event Hub Namespace
       ansible.builtin.replace:
         path: /tmp/silver-to-cloud.yaml
         regexp: '<EVENTHUB_NAMESPACE>'
         replace: "{{ EVENTHUB_NAMESPACE }}"
 
-    - name: Modify file with the name of the event hub name
+    - name: Modify the Data Flow 'Cloud Connector to Azure Event Hub' with the name of the Event Hub
       ansible.builtin.replace:
         path: /tmp/silver-to-cloud.yaml
         regexp: '<EVENTHUB>'
         replace: "{{ EVENTHUB_NAME }}"
 
-    - name: Import the operators dataset in the Distributed State Store
+    - name: Import the 'Operators' Dataset into the Distributed State Store
       ansible.builtin.shell: /tmp/dss_set --key operators --file "/tmp/operators.json" --address localhost
 
-    - name: Import the products dataset in the Distributed State Store
+    - name: Import the 'Products' Dataset into the Distributed State Store
       ansible.builtin.shell: /tmp/dss_set --key products --file "/tmp/products.json" --address localhost
 
-    - name: Deploy Factory Simulator - configuration
+    - name: Deploy Factory MQTT Simulator - Configuration
       ansible.builtin.shell: kubectl apply -f https://raw.githubusercontent.com/chriscrcodes/talk-to-your-factory/main/artifacts/templates/k3s/pods/simulator/configuration.yaml
 
-    - name: Deploy Factory Simulator - deployment
+    - name: Deploy Factory MQTT Simulator - Deployment
       ansible.builtin.shell: kubectl apply -f https://raw.githubusercontent.com/chriscrcodes/talk-to-your-factory/main/artifacts/templates/k3s/pods/simulator/deployment.yaml
 
-    - name: Deploy Factory Simulator - bronze to silver
+    - name: Deploy the Data Flow 'bronze to silver'
       ansible.builtin.shell: kubectl apply -f https://raw.githubusercontent.com/chriscrcodes/talk-to-your-factory/main/artifacts/templates/azure-iot-operations/dataflows/bronze-to-silver.yaml
 
-    - name: Deploy the Cloud connector to Azure Event Hub
+    - name: Deploy the Data Flow 'Cloud Connector to Azure Event Hub'
       ansible.builtin.shell: kubectl apply -f /tmp/silver-to-cloud.yaml
