@@ -8,9 +8,6 @@
 
 ## Create an environment variable file
 - Rename the file [`.env_template`](./artifacts/factory-assistant/.env_template) to `.env`
-    ```bash
-    mv .env_template .env
-    ```
 - Retrieve the environment following variables you defined in [Part 1 - Provision resources (Edge and Cloud)](./INSTALL-1.md) ==> file `variables.yaml`:
     ```bash
     FACTORY_AGENT_SP_APPID
@@ -22,20 +19,19 @@
 - Click on `Workspaces` > `Smart Factory`
 - Select the database `AIO` (type: `KQL Database`)
 - Retrieve the Fabric endpoint from `Overview` > `Query URI` > click `Copy URI`
-- `Connections` > copy the name of your Fabric endpoint (Connection type: `Azure Data Explorer (Kusto)`)
 - Modify environment variables in `.env` file
     ```bash
-    AZURE_OPENAI_ENDPOINT           = <YOUR_AZURE_OPENAI_ENDPOINT>
-    AZURE_OPENAI_API_KEY            = <YOUR_AZURE_OPENAI_KEY>
+    AZURE_OPENAI_ENDPOINT           = < Azure AI Foundry Portal => Target URI >
+    AZURE_OPENAI_API_KEY            = < Azure AI Foundry Portal => Key >
     AZURE_OPENAI_DEPLOYMENT_NAME    = "smart-factory"
     AZURE_OPENAI_MODEL_NAME         = "gpt-4o"
     AZURE_OPENAI_DEPLOYMENT_VERSION = "2024-08-06"
 
-    AZURE_AD_TENANT_ID              = TENANT
-    KUSTO_CLUSTER                   = <YOUR_MICROSOFT_FABRIC_ENDPOINT>
-    KUSTO_MANAGED_IDENTITY_APP_ID   = FACTORY_AGENT_SP_APPID
-    KUSTO_MANAGED_IDENTITY_SECRET   = FACTORY_AGENT_SP_SECRET
-    KUSTO_DATABASE_NAME             = <YOUR_DATABASE>
+    AZURE_AD_TENANT_ID              = < variables.yaml => TENANT >
+    KUSTO_CLUSTER                   = < Microsoft Fabric => Query URI >
+    KUSTO_MANAGED_IDENTITY_APP_ID   = < variables.yaml => FACTORY_AGENT_SP_APPID >
+    KUSTO_MANAGED_IDENTITY_SECRET   = < variables.yaml => FACTORY_AGENT_SP_SECRET >
+    KUSTO_DATABASE_NAME             = "AIO"
     KUSTO_TABLE_NAME                = "aio_gold"
     ```
 
