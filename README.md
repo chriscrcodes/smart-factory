@@ -1,10 +1,17 @@
-# 🗣️ Talk to your factory - implementation guide
+# 🗣️ Talk to your Factory
 
 ## Introduction
-🤖 Smart Factory demo, enhanced by Generative AI.  
-🏭 See how the Smart Factory leverages Generative AI to optimize its operations!  
-🔍 Real-time ingestion and processing of operations data (OT): operators, manufactured products, and machine maintenance schedules.  
-🗣️ Data processing: Edge and Cloud, with a Semantic Kernel to power the Factory Agent, for smarter interactions.  
+
+Welcome to the "Talk to your Factory" project, a fascinating open-source initiative that allows you to control and interact with industrial equipment using natural language processing (NLP), Edge and Cloud technologies.
+
+What's about? The project aims to bridge the gap between humans and industrial machines by enabling people to communicate with factory equipment using simple text inputs.
+
+See how the Smart Factory leverages Generative AI to optimize its operations!
+
+## Technology
+
+🏭 Real-time ingestion and processing of operational data (OT): operators, manufactured products, and machine maintenance schedules.  
+🤖 Data processing: Edge and Cloud, with a Semantic Kernel & Generative AI model to power the Factory Agent, for smarter interactions.
 
 ### Key features and benefits
 

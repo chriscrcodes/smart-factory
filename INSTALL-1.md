@@ -119,7 +119,7 @@
 ## Confirm Data is flowing from Edge (Azure IoT Operations) to Cloud (Azure Event Hub)
   - Locate the Azure Event Hub Namespace you created in [Azure Portal](https://portal.azure.com/)
   - Data Explorer (preview) > select the event hub you created in [Step 1](#step-1---provision-azure-resources) (`EVENTHUB_NAME` variable)
-  - Click on `View events` > and select an event on the right to confirm data flow is operational
+  - Click on `View events` and select a message on the right to confirm data flow is operational
   ![evh-messages](./artifacts/media/evh-messages.png "evh-messages")
 
 - ✅ **You can now continue to** > [Part 2 - Configure the solution in Microsoft Fabric](./INSTALL-2.md)
