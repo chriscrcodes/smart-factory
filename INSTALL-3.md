@@ -3,7 +3,7 @@
 ## Deploy a Large Language Model (LLM) in Azure Open AI
    - [Deploy a base model](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/create-resource?pivots=web-portal#deploy-a-model):
       - Login to [Azure AI Foundry Portal](https://ai.azure.com/)
-      - Select your deployment in `Shared resources` > `Deployments` > `gpt-4o`
+      - Select your deployment in `Shared resources` > `Deployments` > `smart-factory`
       - Copy the following information in `Endpoint` section: `Target URI` and `Key`. We will need them in the next section.
 
 ## Create an environment variable file
@@ -15,7 +15,7 @@
     ```bash
     FACTORY_AGENT_SP_APPID
     FACTORY_AGENT_SP_SECRET
-    AIO_SP_TENANT
+    TENANT
     ```
 - Select 'Real-Time Intelligence' from the [Fabric homepage](https://app.powerbi.com/home?experience=kusto).  
 ![fabric-home](./artifacts/media/fabric-home.png "fabric-home")
@@ -27,11 +27,11 @@
     ```bash
     AZURE_OPENAI_ENDPOINT           = <YOUR_AZURE_OPENAI_ENDPOINT>
     AZURE_OPENAI_API_KEY            = <YOUR_AZURE_OPENAI_KEY>
-    AZURE_OPENAI_DEPLOYMENT_NAME    = "gpt-4o"
+    AZURE_OPENAI_DEPLOYMENT_NAME    = "smart-factory"
     AZURE_OPENAI_MODEL_NAME         = "gpt-4o"
     AZURE_OPENAI_DEPLOYMENT_VERSION = "2024-08-06"
 
-    AZURE_AD_TENANT_ID              = AIO_SP_TENANT
+    AZURE_AD_TENANT_ID              = TENANT
     KUSTO_CLUSTER                   = <YOUR_MICROSOFT_FABRIC_ENDPOINT>
     KUSTO_MANAGED_IDENTITY_APP_ID   = FACTORY_AGENT_SP_APPID
     KUSTO_MANAGED_IDENTITY_SECRET   = FACTORY_AGENT_SP_SECRET

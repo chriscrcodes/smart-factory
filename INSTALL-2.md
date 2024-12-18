@@ -110,11 +110,11 @@
    - Retrieve the environment following variables you defined in [Part 1 - Provision resources (Edge and Cloud)](./INSTALL-1.md) ==> file `variables.yaml`:
      ```bash
      FACTORY_AGENT_SP_APPID
-     AIO_SP_TENANT
+     TENANT
      ```
 - Add the following query:
     ```
-    .add database AIO viewers ('aadapp=<FACTORY_AGENT_SP_APPID>;<AIO_SP_TENANT>') "Gen AI Factory Assistant"
+    .add database AIO viewers ('aadapp=<FACTORY_AGENT_SP_APPID>;<TENANT>') "Gen AI Factory Assistant"
     ```
 - Select the query portion and click `Run`
 
@@ -122,11 +122,11 @@
    - Retrieve the environment following variables you defined in [Part 1 - Provision resources (Edge and Cloud)](./INSTALL-1.md) ==> file `variables.yaml`:
      ```bash
      FACTORY_AGENT_SP_APPID
-     AIO_SP_TENANT
+     TENANT
      ```
 - Add the following query:
     ```
-    .add table aio_gold admins ('aadapp=<FACTORY_AGENT_SP_APPID>;<AIO_SP_TENANT>') "Gen AI Factory Assistant"
+    .add table aio_gold admins ('aadapp=<FACTORY_AGENT_SP_APPID>;<TENANT>') "Gen AI Factory Assistant"
     ```
 - Select the query portion and click `Run`
 
@@ -138,13 +138,13 @@
     - Create new connection
     - Retrieve variables created in [Part 1 - Provision resources (Edge and Cloud)](./INSTALL-1.md) ==> file `variables.yaml`
     - `Event Hub namespace` > `EVENTHUB_NAMESPACE` variable
-    - `Event Hub` > `EVENTHUB_NAME` variable
+    - `Event Hub` > `EVENTHUB_NAME` `
     - Choose a connection name
-    - `Shared Access Key Name` > listen
-    - `Shared Access Key` > can be retrieved from Azure Portal: select your Event Hub Namespace > Entities > Event Hubs > select your Event Hub > Settings > Shared access policies > select Policy 'listen' > copy 'Primary key'
+    - `Shared Access Key Name` > `Listen`
+    - `Shared Access Key` > `EVENTHUB_KEY` variable
     - Check that the connection name is correct
     - Tick the box `Test connection` and click `Connect`
-    - `Consumer group` > type `fabric`
+    - `Consumer group` > type `Fabric`
     - `Data format` > select `Json`
     - `Next` > `Add`
 
