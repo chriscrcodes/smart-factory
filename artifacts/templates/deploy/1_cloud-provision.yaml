@@ -62,6 +62,9 @@
       ansible.builtin.shell: az eventhubs eventhub create --name "{{ EVENTHUB_NAME }}" --resource-group "{{ RESOURCE_GROUP }}" --namespace-name "{{ EVENTHUB_NAMESPACE }}"
       register: eventhub
 
+    - name: Create Event Hub Consumer Group
+      ansible.builtin.shell: az eventhubs eventhub consumer-group create --consumer-group-name "Fabric" --namespace-name "{{ EVENTHUB_NAMESPACE }}" --eventhub-name "{{ EVENTHUB_NAME }}" --resource-group "{{ RESOURCE_GROUP }}"
+
     - name: Create Event Hub authorization rule 'Listen'
       ansible.builtin.shell: az eventhubs eventhub authorization-rule create --resource-group "{{ RESOURCE_GROUP }}" --namespace-name "{{ EVENTHUB_NAMESPACE }}" --eventhub-name "{{ EVENTHUB_NAME }}" --name Listen --rights Listen
 
