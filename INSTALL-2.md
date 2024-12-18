@@ -148,29 +148,30 @@
     - `Data format` > select `Json`
     - `Next` > `Add`
 
-2. Configure event stream destination
-    - Click on `New destination` > `KQL Database`
+2. Configure event stream data transformation
+    - Click on `Transform events` >  `Manage fields`
+    - Connect event stream node to `ManageFields` node
+    - Click on the pencil > `Add all fields`
+    - Set the field `EmployeeId` to `String` (click on the three dots) > `Change type` > `Yes`  
+     ![fabric-eventstream-1-1](./artifacts/media/fabric_eventstream-1-1.png "fabric-eventstream-1-1")  
+    - Set the field `ProductId` to `String`  > `Change type` > `Yes`  
+     ![fabric-eventstream-1-2](./artifacts/media/fabric_eventstream-1-2.png "fabric-eventstream-1-2")
+    - Set the field `Timestamp` to `DateTime`  > `Change type` > `Yes`  
+     ![fabric-eventstream-1-3](./artifacts/media/fabric_eventstream-1-3.png "fabric-eventstream-1-3")
+
+3. Configure event stream destination
+    - Click on `Add destination` >  `Eventhouse`
     - Tick the box `Event processing before ingestion`
     - Choose a `Destination name`
     - `Workspace` > select `Smart Factory`
+    - `Eventhouse` > select `AIO`
     - `KQL Database` > select the database `AIO`
-    - `Destination table` > select `aio_silver`
+    - `KQL Destination table` > select `aio_silver`
     - `Input data format` > `Json`
-    - Tick the box `Activate streaming after adding data source`
-
-3. Configure fields mapping
-    - You may see 3 authoring errors
-    - Click `Open event processor`
-    - Set the field `EmployeeId` to `String` (click on the three dots)  
-     ![fabric-eventstream-1-1](./artifacts/media/fabric_eventstream-1-1.png "fabric-eventstream-1-1")  
-    - Set the field `ProductId` to `String` (same as above for `EmployeeId`)   
-    - Set the field `Timestamp` to `DateTime` (click on the three dots)  
-     ![fabric-eventstream-1-2](./artifacts/media/fabric_eventstream-1-2.png "fabric-eventstream-1-2")  
-    - Ensure the fields are correctly configured as the picture below:  
-     ![fabric-eventstream-1](./artifacts/media/fabric_eventstream-1.png "fabric-eventstream-1")
-    - Click `Done`
-    - Click `Add`    
-
-        ![fabric-eventstream-2](./artifacts/media/fabric_eventstream-2.png "fabric-eventstream-2")
+    - Tick the box `Activate streaming after adding data source` > `Save`
+    - Connect `ManageFields` node to Destination node
+    - Click `Save`  
+     ![fabric-eventstream-2](./artifacts/media/fabric_eventstream-2.png "fabric-eventstream-2")
+    - Click `Publish` to start the Eventstream
 
 - ✅ **You can now continue to** > [Part 3 - Deploy and use the Generative AI Factory Assistant](./INSTALL-3.md)

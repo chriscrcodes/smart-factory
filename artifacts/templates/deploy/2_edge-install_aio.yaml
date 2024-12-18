@@ -60,7 +60,7 @@
 
     - name: Connect to Azure subscription
       ansible.builtin.shell: |
-        az login --service-principal --username "{{ AIO_SP_APPID }}" --password "{{ AIO_SP_SECRET }}" --tenant "{{ TENANT }}"
+        az login --service-principal --username "{{ AIO_SP_APPID }}" --password="{{ AIO_SP_SECRET }}" --tenant "{{ TENANT }}"
         az account set --subscription "{{ SUBSCRIPTION_ID }}"
 
     - name: Connect Edge Cluster to Azure Arc
