@@ -118,7 +118,7 @@ st.title(title)
 
 # Initialize session state for messages if not already present
 if "messages" not in st.session_state:
-    st.session_state.messages = [{"role": "assistant", "content": config['streamlit']['assistant_intro_message']}]
+    st.session_state.messages = [{"role": "assistant", "content": config['streamlit']['agent_intro_message']}]
 
 # Ensure chat history is initialized as well
 if "chat_history" not in st.session_state:
@@ -139,7 +139,7 @@ with st.sidebar:
 
 # Display chat messages in the chat window
 if "messages" not in st.session_state:
-    st.session_state.messages = [{"role": "assistant", "content": config['streamlit']['assistant_intro_message']}]
+    st.session_state.messages = [{"role": "assistant", "content": config['streamlit']['agent_intro_message']}]
 
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
@@ -157,7 +157,7 @@ if prompt := st.chat_input():
 
 last_msg = st.session_state.messages[-1]
 
-# Generate a new response if the last message is not from the assistant
+# Generate a new response if the last message is not from the agent
 if last_msg["role"] != "assistant":
     with st.chat_message("assistant"):
         with st.spinner('Thinking...'):

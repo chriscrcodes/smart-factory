@@ -1,6 +1,0 @@
----
-streamlit:
-  title: "AI Factory Assistant"
-  tab_title: "AI Factory Assistant"
-  logo: "./images/smart-factory.jpeg"
-  assistant_intro_message: "How can I help?"

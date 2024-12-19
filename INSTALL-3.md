@@ -1,4 +1,4 @@
-# Part 4 - Deploy and use the Generative AI Factory Assistant
+# Part 4 - Deploy and use the Generative AI Factory Agent
 
 ## Deploy a Large Language Model (LLM) in Azure Open AI
    - [Deploy a base model](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/create-resource?pivots=web-portal#deploy-a-model):
@@ -7,7 +7,7 @@
       - Copy the following information in `Endpoint` section: `Target URI` and `Key`. We will need them in the next section.
 
 ## Create an environment variable file
-- Rename the file [`.env_template`](./artifacts/factory-assistant/.env_template) to `.env`
+- Rename the file [`.env_template`](./artifacts/factory-agent/.env_template) to `.env`
 - Retrieve the environment following variables you defined in [Part 1 - Provision resources (Edge and Cloud)](./INSTALL-1.md) ==> file `variables.yaml`:
     ```bash
     FACTORY_AGENT_SP_APPID
@@ -35,20 +35,20 @@
     KUSTO_TABLE_NAME                = "aio_gold"
     ```
 
-## Start the Factory Assistant Application
+## Start the Factory Agent Application
 - Option 1 (from command line)
-    - Start a terminal from the [directory](./artifacts/factory-assistant/)
+    - Start a terminal from the [directory](./artifacts/factory-agent/)
     - Execute the following commands:
         ```bash
         pip install -r requirements.txt
         streamlit run .\frontend.py
         ```
 - Option 2 (Docker)
-    - Start a terminal from the [directory](./artifacts/factory-assistant/)
+    - Start a terminal from the [directory](./artifacts/factory-agent/)
     - Execute the following commands:
         ```bash
-        docker build . -t factory-assistant:v1.0
-        docker run -p 8501:8501 factory-assistant:v1.0
+        docker build . -t factory-agent:v1.0
+        docker run -p 8501:8501 factory-agent:v1.0
         ```
 - Launch a browser with the following URL to access the application:
     ```
@@ -58,4 +58,4 @@
     > **IMPORTANT**: No actual data from the database is transmitted to the Large Language Model; only the prompt and the database schema are shared. The LLM will generate the query to be executed against the database, but it won't execute the query itself.  
 - Some example queries are provided.
 
-    ![Factory Assistant User Interface](./artifacts/media/demo-video.gif "Factory Assistant User Interface")
+    ![Factory Agent User Interface](./artifacts/media/demo-video.gif "Factory Agent User Interface")

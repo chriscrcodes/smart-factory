@@ -106,7 +106,7 @@
     ```
 - Select the query portion and click `Run`
 
-## Authorize the Factory Assistant to query the database
+## Authorize the Factory Agent to query the database
    - Retrieve the environment following variables you defined in [Part 1 - Provision resources (Edge and Cloud)](./INSTALL-1.md) ==> file `variables.yaml`:
      ```bash
      FACTORY_AGENT_SP_APPID
@@ -114,11 +114,11 @@
      ```
 - Add the following query:
     ```
-    .add database AIO viewers ('aadapp=<FACTORY_AGENT_SP_APPID>;<TENANT>') "Gen AI Factory Assistant"
+    .add database AIO viewers ('aadapp=<FACTORY_AGENT_SP_APPID>;<TENANT>') "Gen AI Factory Agent"
     ```
 - Select the query portion and click `Run`
 
-## Authorize the Factory Assistant to query the table
+## Authorize the Factory Agent to query the table
    - Retrieve the environment following variables you defined in [Part 1 - Provision resources (Edge and Cloud)](./INSTALL-1.md) ==> file `variables.yaml`:
      ```bash
      FACTORY_AGENT_SP_APPID
@@ -126,7 +126,7 @@
      ```
 - Add the following query:
     ```
-    .add table aio_gold admins ('aadapp=<FACTORY_AGENT_SP_APPID>;<TENANT>') "Gen AI Factory Assistant"
+    .add table aio_gold admins ('aadapp=<FACTORY_AGENT_SP_APPID>;<TENANT>') "Gen AI Factory Agent"
     ```
 - Select the query portion and click `Run`
 
@@ -174,4 +174,4 @@
      ![fabric-eventstream-2](./artifacts/media/fabric_eventstream-2.png "fabric-eventstream-2")
     - Click `Publish` to start the Eventstream
 
-- ✅ **You can now continue to** > [Part 3 - Deploy and use the Generative AI Factory Assistant](./INSTALL-3.md)
+- ✅ **You can now continue to** > [Part 3 - Deploy and use the Generative AI Factory Agent](./INSTALL-3.md)
