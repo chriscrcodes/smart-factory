@@ -76,7 +76,7 @@
       ansible.builtin.shell: az cognitiveservices account create --name "{{ AZURE_OPENAI_NAME }}" --resource-group "{{ RESOURCE_GROUP }}" --location "eastus" --kind OpenAI --sku s0 --subscription "{{ SUBSCRIPTION_ID }}"
 
     - name: Create GenAI model in Azure Open AI Service
-      ansible.builtin.shell: az cognitiveservices account deployment create --resource-group "{{ RESOURCE_GROUP }}" --name "{{ AZURE_OPENAI_NAME }}" --deployment-name "smart-factory" --model-name "gpt-4o" --model-version "2024-08-06" --model-format OpenAI --sku-capacity 1 --sku-name "Standard"
+      ansible.builtin.shell: az cognitiveservices account deployment create --resource-group "{{ RESOURCE_GROUP }}" --name "{{ AZURE_OPENAI_NAME }}" --deployment-name "smart-factory" --model-name "gpt-4o" --model-version "2024-08-06" --model-format OpenAI --sku-capacity 1000 --sku-name "GlobalStandard"
 
     - name: Create Service Principal for the GenAI Factory Agent
       ansible.builtin.shell: az ad sp create-for-rbac --name "{{ FACTORY_AGENT_SERVICE_PRINCIPAL }}"
