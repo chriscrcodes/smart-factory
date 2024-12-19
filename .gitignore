@@ -1,4 +1,5 @@
 **/.env
+**/variables.yaml
 **/__pycache__/
 vale.ini
 styles/

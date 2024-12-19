@@ -1,0 +1,6 @@
+---
+streamlit:
+  title: "AI Factory Agent"
+  tab_title: "AI Factory Agent"
+  logo: "./images/smart-factory.jpeg"
+  agent_intro_message: "How can I help?"
